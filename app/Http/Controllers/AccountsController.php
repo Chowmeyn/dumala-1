@@ -18,6 +18,7 @@ class AccountsController extends Controller
     }
 
     public function users_list(Request $request)
+<<<<<<< HEAD
     {
         $search = $request->input('search');
         $role = $request->input('role');
@@ -29,6 +30,7 @@ class AccountsController extends Controller
         $query = User::where('role', '!=', 'admin');
     
         if (!empty($search)) {
+<<<<<<< Updated upstream
 >>>>>>> upstream/main
 
         $query = User::query();
@@ -51,7 +53,33 @@ class AccountsController extends Controller
         $users = $query->paginate($perPage);
 
         return UserResource::collection($users);
+=======
+=======
+{
+    $search = $request->input('search');
+    $role = $request->input('role');
+    $perPage = $request->input('perPage', 10); // Default to 10 items per page
+>>>>>>> 67d91adb (added accounts filter and login validation)
+
+    $query = User::query();
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('firstname', 'like', '%' . $search . '%')
+              ->orWhere('lastname', 'like', '%' . $search . '%')
+              ->orWhere('role', 'like', '%' . $search . '%');
+        });
+>>>>>>> Stashed changes
     }
+
+    if ($role && $role !== 'all') {
+        $query->where('role', $role);
+    }
+
+    $users = $query->paginate($perPage);
+
+    return UserResource::collection($users);
+}
 
     public function edit($userId)
     {

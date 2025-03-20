@@ -161,14 +161,39 @@
 
     <!-- BEGIN panel -->
     <div class="panel panel-inverse" style="padding-left: 0px !important; padding-right: 0px !important;">
+<<<<<<< HEAD
         <!-- BEGIN panel-heading -->
         <div class="panel-heading" style="background: #fdfeff !important; padding-bottom: 0px !important;">
+<<<<<<< Updated upstream
             <h4 class="panel-title pt-2" style="width: auto !important;">
                 <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm"
                     style="display: inline !important;">
                     Add Account
                 </a>
             </h4>
+=======
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="btn-group w-100">
+                        <a class="btn btn-outline-inverse all active ">All</a>
+                        <a class="btn btn-outline-inverse all active ">All</a>
+                        <a class="btn btn-outline-inverse priest ">Priest</a>
+                        <a class="btn btn-outline-inverse secretary">Secretary</a>
+                        <a class="btn btn-outline-inverse parishioners">Parishioners</a>
+                        <a class="btn btn-outline-inverse non_parishioners">Non-parishioners</a>
+                    </div>
+                </div>
+                <div class="col-md-12 mt-2">
+                    <h4 class="panel-title pt-2" style="width: auto !important;">
+                        <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm"
+                            style="display: inline !important;">
+                            Add Account
+                        </a>
+                    </h4>
+                </div>
+            </div>
+
+>>>>>>> Stashed changes
 
         </div>
         <!-- END panel-heading -->
@@ -210,6 +235,7 @@
                 <div class="dt-info" aria-live="polite" id="accounts-table_info" role="status">
                     Showing 0 to 0 of 0 entries
                 </div>
+<<<<<<< Updated upstream
             </div>
             <div class="col-md-auto ms-auto">
                 <div class="dt-paging paging_full_numbers">
@@ -223,6 +249,87 @@
     <!-- END panel-body -->
 </div>
         <!-- END panel -->
+=======
+                <div class="col-md-auto ms-auto">
+                    <div class="dt-paging paging_full_numbers">
+                        <ul class="pagination" id="pagination-container">
+                            <!-- Pagination buttons will be dynamically inserted here -->
+                        </ul>
+                    </div>
+=======
+    <!-- BEGIN panel-heading -->
+    <div class="panel-heading" style="background: #fdfeff !important; padding-bottom: 0px !important;">
+        <h4 class="panel-title pt-2" style="width: auto !important;">
+            <!-- User Role Filter -->
+            <div class="btn-group" role="group" aria-label="User Role Filter">
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('all')">All</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('admin')">Admin</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('parish_priest')">Parish Priest</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('secretary')">Secretary</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('priest')">Priest</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('parishioners')">Parishioners</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('non_parishioners')">Non-parishioners</button>
+            </div>
+            <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm" style="display: inline !important;">
+                Add Account
+            </a>
+        </h4>
+    </div>
+    <!-- END panel-heading -->
+    <!-- BEGIN panel-body -->
+    <div class="panel-body" style="padding-bottom: 0px !important;">
+        <!-- Search Input -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role" oninput="getList(this.value)">
+                    <div class="input-group-text" style="background: #fdfeff !important;"><i class="fa fa-search"></i></div>
+>>>>>>> 67d91adb (added accounts filter and login validation)
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <table id="accounts-table" width="100%" class="table">
+            <thead>
+                <tr>
+                    <th width="1%"></th>
+                    <th width="1%" data-orderable="false"></th>
+                    <th class="text-nowrap">Name</th>
+                    <th class="text-nowrap">Role</th>
+                    <th width="1%" class="text-nowrap">Status</th>
+                    <th class="text-nowrap" style="text-align: right; padding-right: 50px">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- User data rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="row mt-2 justify-content-between">
+            <div class="col-md-auto me-auto">
+                <div class="dt-info" aria-live="polite" id="accounts-table_info" role="status">
+                    Showing 0 to 0 of 0 entries
+                </div>
+            </div>
+            <div class="col-md-auto ms-auto">
+                <div class="dt-paging paging_full_numbers">
+                    <ul class="pagination" id="pagination-container">
+                        <!-- Pagination buttons will be dynamically inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END panel-body -->
+</div>
+        <!-- BEGIN hljs-wrapper -->
+
+        <!-- END hljs-wrapper -->
+    </div>
+    <!-- END panel -->
+>>>>>>> Stashed changes
     </div>
     
     <!-- Add Account Modal -->
@@ -618,6 +725,7 @@ $('#editAccountForm').on('submit', function(event) {
     });
 });
 
+<<<<<<< Updated upstream
 $(document).ready(function() {
     // Initialize the active tab
     $('#all-tab').addClass('active-filter');
@@ -638,6 +746,8 @@ $(document).ready(function() {
     getList(null);
 });
 
+=======
+>>>>>>> Stashed changes
 function filterByRole(role) {
     const search = $('#search-input').val();
     getList(search, '/user-list', role);
@@ -653,6 +763,7 @@ function getList(search, url = '/user-list', role = 'all') {
         },
         dataType: 'json',
         success: function(response) {
+<<<<<<< Updated upstream
             renderTable(response);
         },
         error: function(xhr, status, error) {
@@ -660,6 +771,10 @@ function getList(search, url = '/user-list', role = 'all') {
         }
     });
 }
+=======
+<<<<<<< HEAD
+            let tableContent = '';
+>>>>>>> Stashed changes
 
 function renderTable(response) {
     let tableContent = '';
@@ -730,11 +845,97 @@ function renderTable(response) {
                 }
             });
 
+<<<<<<< Updated upstream
+            $('#pagination-container').html(paginationLinks);
+=======
+                $('#pagination-container').html(paginationLinks);
+            }
+=======
+            renderTable(response);
+>>>>>>> 67d91adb (added accounts filter and login validation)
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching data:', error);
+>>>>>>> Stashed changes
+        }
+    }
+}
+
+<<<<<<< Updated upstream
+=======
+function renderTable(response) {
+    let tableContent = '';
+
+    if (response.data.length === 0) {
+        tableContent = `
+            <tr>
+                <td colspan="6" class="text-center">No data available</td>
+            </tr>
+        `;
+    } else {
+        response.data.forEach((user, index) => {
+            const profileImage = user.profile_image ?
+                `<img src="${user.profile_image}" class="rounded h-30px my-n1 mx-n1" />` :
+                `<img src="/assets/img/user/user-profile-icon.jpg" class="rounded h-30px my-n1 mx-n1" />`;
+
+            const isChecked = user.user_status === 'active';
+            const statusSwitch = `
+                <div class="switch-container">
+                    <input type="checkbox" id="customSwitch${user.id}" onchange="updateSwitchText(${user.id})"
+                           class="switch-input" ${isChecked ? 'checked' : ''} />
+                    <label for="customSwitch${user.id}" class="switch-label">
+                        <span title="${isChecked ? 'Active' : 'Deactivated'}" class="switch-text switch-text${user.id}">${isChecked ? 'Active' : 'Deactivated'}</span>
+                    </label>
+                </div>
+            `;
+
+            tableContent += `
+                <tr>
+                    <td width="1%" class="fw-bold">${index + 1}</td>
+                    <td width="1%" class="with-img">${profileImage}</td>
+                    <td>${user.prefix ? user.prefix+'.': ''} ${user.firstname} ${user.lastname}</td>
+                    <td>${user.role}</td>
+                    <td>${statusSwitch}</td>
+                    <td style="text-align: right; padding-right: 50px">
+                        <a href="#" data-bs-toggle="dropdown" class="text-body text-opacity-50">
+                            <i class="fa fa-ellipsis-h fs-30px"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a href="#" class="dropdown-item" onclick="openEditModal(${user.id})">Edit</a>
+                            <a href="#" onclick="delete_user(${user.id})" class="dropdown-item">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    $('#accounts-table tbody').html(tableContent);
+
+    if (response.meta) {
+        const paginationInfo =
+            `Showing ${response.meta.from} to ${response.meta.to} of ${response.meta.total} entries`;
+        $('#accounts-table_info').text(paginationInfo);
+
+        if (response.meta.links) {
+            let paginationLinks = '';
+            response.meta.links.forEach(link => {
+                if (link.url) {
+                    const label = link.label.replace(/&laquo;|&raquo;/g, '').trim();
+                    if (!isNaN(label)) {
+                        paginationLinks += `<li class="page-item ${link.active ? 'active' : ''}">
+                                                <a href="#" class="page-link" data-url="${link.url}" onclick="handlePaginationClick(event)">${label}</a>
+                                            </li>`;
+                    }
+                }
+            });
+
             $('#pagination-container').html(paginationLinks);
         }
     }
 }
 
+>>>>>>> Stashed changes
 function handlePaginationClick(event) {
     event.preventDefault();
     const url = $(event.target).data('url');
