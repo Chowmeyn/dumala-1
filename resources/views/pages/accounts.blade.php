@@ -105,116 +105,80 @@
 
     <!-- BEGIN panel -->
     <div class="panel panel-inverse" style="padding-left: 0px !important; padding-right: 0px !important;">
-        <!-- BEGIN panel-heading -->
-        <div class="panel-heading" style="background: #fdfeff !important; padding-bottom: 0px !important;">
-            <h4 class="panel-title pt-2" style="width: auto !important;">
-                <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm"
-                    style="display: inline !important;">
-                    Add Account
-                </a>
-            </h4>
-
-        </div>
-        <!-- END panel-heading -->
-        <!-- BEGIN panel-body -->
-        <div class="panel-body" style="padding-bottom: 0px !important;">
-            <!-- Search Input -->
-            <div class="row">
-                <div class="col-md-12">
-
-                    <div class="input-group">
-                        <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role"
-                            oninput="getList(this.value)">
-                        <div class="input-group-text" style="background: #fdfeff !important;"><i
-                                class="fa fa-search"></i></div>
-                    </div>
-                </div>
+    <!-- BEGIN panel-heading -->
+    <div class="panel-heading" style="background: #fdfeff !important; padding-bottom: 0px !important;">
+        <h4 class="panel-title pt-2" style="width: auto !important;">
+            <!-- User Role Filter -->
+            <div class="btn-group" role="group" aria-label="User Role Filter">
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('all')">All</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('admin')">Admin</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('parish_priest')">Parish Priest</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('secretary')">Secretary</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('priest')">Priest</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('parishioners')">Parishioners</button>
+                <button type="button" class="btn btn-secondary" onclick="filterByRole('non_parishioners')">Non-parishioners</button>
             </div>
-
-            <!-- Table -->
-            <table id="accounts-table" width="100%" class="table">
-                <thead>
-                    <tr>
-                        <th width="1%"></th>
-                        <th width="1%" data-orderable="false"></th>
-                        <th class="text-nowrap">Name</th>
-                        <th class="text-nowrap">Role</th>
-                        <th  width="1%" class="text-nowrap">Status</th>
-                        <th class="text-nowrap" style="text-align: right; padding-right: 50px">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- User data rows will be dynamically inserted here -->
-                </tbody>
-            </table>
-
-            <!-- Pagination -->
-            <div class="row mt-2 justify-content-between">
-                <div class="col-md-auto me-auto">
-                    <div class="dt-info" aria-live="polite" id="accounts-table_info" role="status">
-                        Showing 0 to 0 of 0 entries
-                    </div>
-                </div>
-                <div class="col-md-auto ms-auto">
-                    <div class="dt-paging paging_full_numbers">
-                        <ul class="pagination" id="pagination-container">
-                            <!-- Pagination buttons will be dynamically inserted here -->
-                        </ul>
-                    </div>
+            <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm" style="display: inline !important;">
+                Add Account
+            </a>
+        </h4>
+    </div>
+    <!-- END panel-heading -->
+    <!-- BEGIN panel-body -->
+    <div class="panel-body" style="padding-bottom: 0px !important;">
+        <!-- Search Input -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role" oninput="getList(this.value)">
+                    <div class="input-group-text" style="background: #fdfeff !important;"><i class="fa fa-search"></i></div>
                 </div>
             </div>
         </div>
-        <!-- END panel-body -->
+
+        <!-- Table -->
+        <table id="accounts-table" width="100%" class="table">
+            <thead>
+                <tr>
+                    <th width="1%"></th>
+                    <th width="1%" data-orderable="false"></th>
+                    <th class="text-nowrap">Name</th>
+                    <th class="text-nowrap">Role</th>
+                    <th width="1%" class="text-nowrap">Status</th>
+                    <th class="text-nowrap" style="text-align: right; padding-right: 50px">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- User data rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="row mt-2 justify-content-between">
+            <div class="col-md-auto me-auto">
+                <div class="dt-info" aria-live="polite" id="accounts-table_info" role="status">
+                    Showing 0 to 0 of 0 entries
+                </div>
+            </div>
+            <div class="col-md-auto ms-auto">
+                <div class="dt-paging paging_full_numbers">
+                    <ul class="pagination" id="pagination-container">
+                        <!-- Pagination buttons will be dynamically inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END panel-body -->
+</div>
         <!-- BEGIN hljs-wrapper -->
 
         <!-- END hljs-wrapper -->
     </div>
     <!-- END panel -->
-    <!-- END row -->
-    <!-- #modal-dialog -->
-    <div class="modal fade" id="modal-dialog">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-
-            <div class="modal-content">
-                <div class="modal-header" style="border: 0px !important">
-
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row" style="margin-bottom: 50px">
-                        <div class="col-4">
-                            <img src="{{ asset('assets/img/user/user-12.jpg') }}" width="200" alt=""
-                                style="border-radius: 100px; margin-left: 35px !important" />
-                        </div>
-                        <div class="col-8 pt-3">
-                            <div class="row">
-                                <div class="col-12">
-                                    <h4 class="widget-list-title">Christopher Struth</h4>
-                                </div>
-                                <hr>
-                                <div class="col-12">
-                                    <p class="widget-list-desc">Bank Transfer</p>
-                                </div>
-                                <div class="col-12">
-                                    <p class="widget-list-desc">Bank Transfer</p>
-                                </div>
-                                <div class="col-12">
-                                    <p class="widget-list-desc">Bank Transfer</p>
-                                </div>
-                                <div class="col-12">
-                                    <p class="widget-list-desc">Bank Transfer</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
     </div>
-
-    <!-- #modal-dialog-add -->
+    
+    <!-- Add Account Modal -->
     <div class="modal fade" id="modal-dialog-add">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -312,9 +276,7 @@
         </div>
     </div>
 
-
-
-
+<!-- Edit Account Modal -->
     <div class="modal fade" id="modal-dialog-edit">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -558,82 +520,22 @@ $('#editAccountForm').on('submit', function(event) {
     });
 });
 
-function getList(search, url = '/user-list') {
+function filterByRole(role) {
+    const search = $('#search-input').val();
+    getList(search, '/user-list', role);
+}
+
+function getList(search, url = '/user-list', role = 'all') {
     $.ajax({
         url: url,
         method: 'GET',
         data: {
-            search: search, // Include search parameter
+            search: search,
+            role: role
         },
         dataType: 'json',
         success: function(response) {
-            let tableContent = '';
-
-            if (response.data.length === 0) {
-                tableContent = `
-                    <tr>
-                        <td colspan="6" class="text-center">No data available</td>
-                    </tr>
-                `;
-            } else {
-                response.data.forEach((user, index) => {
-                    // Determine profile image or fallback
-                    const profileImage = user.profile_image ?
-                        `<img src="${user.profile_image}" class="rounded h-30px my-n1 mx-n1" />` :
-                        `<img src="/assets/img/user/user-profile-icon.jpg" class="rounded h-30px my-n1 mx-n1" />`;
-
-                    // Determine the status checkbox and label
-                    const isChecked = user.user_status === 'active';
-                    const statusSwitch = `
-                        <div class="switch-container">
-                            <input type="checkbox" id="customSwitch${user.id}" onchange="updateSwitchText(${user.id})"
-                                   class="switch-input" ${isChecked ? 'checked' : ''} />
-                            <label for="customSwitch${user.id}" class="switch-label">
-                                <span title="${isChecked ? 'Active' : 'Deactivated'}" class="switch-text switch-text${user.id}">${isChecked ? 'Active' : 'Deactivated'}</span>
-                            </label>
-                        </div>
-                    `;
-
-                    // Create the table row
-                    tableContent += `
-                        <tr>
-                            <td width="1%" class="fw-bold">${index + 1}</td>
-                            <td width="1%" class="with-img">${profileImage}</td>
-                            <td>${user.prefix ? user.prefix+'.': ''} ${user.firstname} ${user.lastname}</td>
-                            <td>${user.role}</td>
-                            <td>${statusSwitch}</td>
-                            <td style="text-align: right; padding-right: 50px">
-                                <a href="#" data-bs-toggle="dropdown" class="text-body text-opacity-50">
-                                    <i class="fa fa-ellipsis-h fs-30px"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" onclick="openEditModal(${user.id})">Edit</a>
-                                    <a href="#" onclick="delete_user(${user.id})" class="dropdown-item">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-
-            $('#accounts-table tbody').html(tableContent);
-
-            const paginationInfo =
-                `Showing ${response.meta.from} to ${response.meta.to} of ${response.meta.total} entries`;
-            $('#accounts-table_info').text(paginationInfo);
-
-            if (response.meta && response.meta.links) {
-                let paginationLinks = '';
-                response.meta.links.forEach(link => {
-                    if (link.url) {
-                        paginationLinks += `<li class="page-item ${link.active ? 'active' : ''}">
-                                                <a href="#" class="page-link" data-url="${link.url}" onclick="handlePaginationClick(event)">${link.label}</a>
-                                              </li>`;
-                    }
-                });
-
-                $('#pagination-container').html(paginationLinks);
-            }
+            renderTable(response);
         },
         error: function(xhr, status, error) {
             console.error('Error fetching data:', error);
@@ -641,7 +543,78 @@ function getList(search, url = '/user-list') {
     });
 }
 
-// Handle pagination button click
+function renderTable(response) {
+    let tableContent = '';
+
+    if (response.data.length === 0) {
+        tableContent = `
+            <tr>
+                <td colspan="6" class="text-center">No data available</td>
+            </tr>
+        `;
+    } else {
+        response.data.forEach((user, index) => {
+            const profileImage = user.profile_image ?
+                `<img src="${user.profile_image}" class="rounded h-30px my-n1 mx-n1" />` :
+                `<img src="/assets/img/user/user-profile-icon.jpg" class="rounded h-30px my-n1 mx-n1" />`;
+
+            const isChecked = user.user_status === 'active';
+            const statusSwitch = `
+                <div class="switch-container">
+                    <input type="checkbox" id="customSwitch${user.id}" onchange="updateSwitchText(${user.id})"
+                           class="switch-input" ${isChecked ? 'checked' : ''} />
+                    <label for="customSwitch${user.id}" class="switch-label">
+                        <span title="${isChecked ? 'Active' : 'Deactivated'}" class="switch-text switch-text${user.id}">${isChecked ? 'Active' : 'Deactivated'}</span>
+                    </label>
+                </div>
+            `;
+
+            tableContent += `
+                <tr>
+                    <td width="1%" class="fw-bold">${index + 1}</td>
+                    <td width="1%" class="with-img">${profileImage}</td>
+                    <td>${user.prefix ? user.prefix+'.': ''} ${user.firstname} ${user.lastname}</td>
+                    <td>${user.role}</td>
+                    <td>${statusSwitch}</td>
+                    <td style="text-align: right; padding-right: 50px">
+                        <a href="#" data-bs-toggle="dropdown" class="text-body text-opacity-50">
+                            <i class="fa fa-ellipsis-h fs-30px"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a href="#" class="dropdown-item" onclick="openEditModal(${user.id})">Edit</a>
+                            <a href="#" onclick="delete_user(${user.id})" class="dropdown-item">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    $('#accounts-table tbody').html(tableContent);
+
+    if (response.meta) {
+        const paginationInfo =
+            `Showing ${response.meta.from} to ${response.meta.to} of ${response.meta.total} entries`;
+        $('#accounts-table_info').text(paginationInfo);
+
+        if (response.meta.links) {
+            let paginationLinks = '';
+            response.meta.links.forEach(link => {
+                if (link.url) {
+                    const label = link.label.replace(/&laquo;|&raquo;/g, '').trim();
+                    if (!isNaN(label)) {
+                        paginationLinks += `<li class="page-item ${link.active ? 'active' : ''}">
+                                                <a href="#" class="page-link" data-url="${link.url}" onclick="handlePaginationClick(event)">${label}</a>
+                                            </li>`;
+                    }
+                }
+            });
+
+            $('#pagination-container').html(paginationLinks);
+        }
+    }
+}
+
 function handlePaginationClick(event) {
     event.preventDefault();
     const url = $(event.target).data('url');
@@ -668,7 +641,6 @@ function updateSwitchText(id) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-
             if (response.success) {
                 message({
                     title: 'Success!',
@@ -689,7 +661,6 @@ function updateSwitchText(id) {
             console.error('Error updating user:', error);
         }
     });
-
 }
 
 function delete_user(id) {
@@ -701,12 +672,10 @@ function delete_user(id) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-
             if (response.success) {
-
                 message({
                     title: 'Success!',
-                    message: 'Account delete successfully!',
+                    message: 'Account deleted successfully!',
                     icon: 'success'
                 });
                 getList(null);
@@ -719,9 +688,10 @@ function delete_user(id) {
             }
         },
         error: function(xhr, status, error) {
-            console.error('Error updating user:', error);
+            console.error('Error deleting user:', error);
         }
     });
 }
+
 </script>
 @endpush

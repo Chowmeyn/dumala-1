@@ -18,25 +18,29 @@ class AccountsController extends Controller
     }
 
     public function users_list(Request $request)
-    {
-        $search = $request->input('search');
-        
-        $perPage = $request->input('perPage', 10); // Default to 10 items per page
-        $page = $request->input('page', 1); // Default to page 1
-    
-        $query = User::query();
-    
-        if (!empty($search)) {
+{
+    $search = $request->input('search');
+    $role = $request->input('role');
+    $perPage = $request->input('perPage', 10); // Default to 10 items per page
 
-            $query->where('firstname', 'like', '%' . $search . '%')
-                  ->orWhere('lastname', 'like', '%' . $search . '%')
-                  ->orWhere('role', 'like', '%' . $search . '%');
-        }
-    
-        $users = $query->paginate($perPage);
-    
-        return UserResource::collection($users);
+    $query = User::query();
+
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('firstname', 'like', '%' . $search . '%')
+              ->orWhere('lastname', 'like', '%' . $search . '%')
+              ->orWhere('role', 'like', '%' . $search . '%');
+        });
     }
+
+    if ($role && $role !== 'all') {
+        $query->where('role', $role);
+    }
+
+    $users = $query->paginate($perPage);
+
+    return UserResource::collection($users);
+}
 
     public function edit($userId)
     {

@@ -99,6 +99,8 @@ $(document).ready(function() {
             data: formData,
             success: function(response) {
 
+                console.log(response); 
+
                 if (response.field == 1) {
                     // Handle success
                     $('#loginMessage')
@@ -116,16 +118,47 @@ $(document).ready(function() {
                         .html(response.message)
                         .show();
 
+                } else if (response.field == 3) {
+                    $('#password').val('');
+                    $('#loginMessage')
+                        .addClass('alert-danger')
+                        .html(response.message)
+                        .show();
+
                 } else if (response.field == 4) {
                     $('#email').val('');
                     $('#loginMessage')
                         .addClass('alert-danger')
                         .html(response.message)
                         .show();
-                } else {
+                // } else {
+                //     $('#loginMessage')
+                //         .addClass('alert-danger')
+                //         .html(response.message)
+                //         .show();
+                }
+            }, error: function(xhr) {
+                // Check if the response status is 422 (validation error)
+                if (xhr.status === 422) {
+                    // Get the validation errors from the response
+                    var errors = xhr.responseJSON.errors;
+                    var errorMessage = '';
+
+                    // Loop through each error and create a string with all the messages
+                    $.each(errors, function(field, messages) {
+                        errorMessage += messages.join('\n');
+                    });
+
+                    // Display the error messages in the login message container
                     $('#loginMessage')
                         .addClass('alert-danger')
-                        .html(response.message)
+                        .html(errorMessage.replace(/\n/g, '<br>'))
+                        .show();
+                } else {
+                    // If any other error occurs
+                    $('#loginMessage')
+                        .addClass('alert-danger')
+                        .html('An unexpected error occurred. Please try again.')
                         .show();
                 }
             }

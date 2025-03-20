@@ -56,10 +56,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/user/store', [UserController::class, 'store'])->name('user.store');
 
-    
+
     Route::get('/user-list', [App\Http\Controllers\AccountsController::class, 'users_list'])->name('user-list');
 
-
+    
     Route::get('/user/{userId}/edit', [App\Http\Controllers\AccountsController::class, 'edit']);
     Route::post('/user/{userId}/update', [App\Http\Controllers\AccountsController::class, 'update']);
     Route::post('/user/{userId}/update_status', [App\Http\Controllers\AccountsController::class, 'update_status']);
