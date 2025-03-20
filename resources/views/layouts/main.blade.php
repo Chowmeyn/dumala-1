@@ -387,6 +387,17 @@
 
                                     <div class="col-12">
                                         <div class="form-floating mb-0 mb-md-0">
+                                            <input type="tel" class="form-control fs-15px" id="editContactProfile"
+                                                name="contact" placeholder="Contact Number"
+                                                maxlength="11" pattern="\d{11}" inputmode="numeric"
+                                                required
+                                                title="Contact number must be 11 digits"
+                                                style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important;">
+                                            <label for="editContactProfile" class="d-flex align-items-center fs-13px">Contact Number</label>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col-12">
+                                        <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editContactProfile"
                                                 name="contact" placeholder="Contact Number"
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important; ">
@@ -394,7 +405,7 @@
                                                 class="d-flex align-items-center fs-13px">Contact
                                                 Number</label>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="col-12">
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="email" class="form-control fs-15px" id="editEmailProfile"
