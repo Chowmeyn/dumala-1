@@ -7,6 +7,14 @@
 
 <!-- ================== END page-css ================== -->
 <style>
+
+.active-filter{
+    border-bottom: 2px solid #2c3e50 !important;
+    background-color: white !important;
+    color: #2c3e50 !important;
+    border-radius: 0px !important;
+}
+
 .switch-container {
     position: relative;
     display: inline-block;
@@ -106,22 +114,45 @@
     <!-- BEGIN panel -->
     <div class="panel panel-inverse" style="padding-left: 0px !important; padding-right: 0px !important;">
     <!-- BEGIN panel-heading -->
-    <div class="panel-heading" style="background: #fdfeff !important; padding-bottom: 0px !important;">
+    <div class="panel-heading d-flex justify-content-between align-items-center" style="background: #fdfeff !important; padding-bottom: 0px !important;">
         <h4 class="panel-title pt-2" style="width: auto !important;">
             <!-- User Role Filter -->
-            <div class="btn-group" role="group" aria-label="User Role Filter">
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('all')">All</button>
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('admin')">Admin</button>
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('parish_priest')">Parish Priest</button>
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('secretary')">Secretary</button>
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('priest')">Priest</button>
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('parishioners')">Parishioners</button>
-                <button type="button" class="btn btn-secondary" onclick="filterByRole('non_parishioners')">Non-parishioners</button>
-            </div>
-            <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm" style="display: inline !important;">
-                Add Account
-            </a>
+            <ul class="nav nav-pills mb-2 mt-2" style="margin-left: 8px !important">
+                <li class="nav-item">
+                    <a href="#" data-val="all" id="all-tab" class="nav-link" onclick="filterByRole('all')">
+                        <span class="d-sm-block d-none"><strong>All</strong></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-val="parish_priest" id="parish_priest-tab" class="nav-link" onclick="filterByRole('parish_priest')">
+                        <span class="d-sm-block d-none"><strong>Parish Priest</strong></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-val="secretary" id="secretary-tab" class="nav-link" onclick="filterByRole('secretary')">
+                        <span class="d-sm-block d-none"><strong>Secretary</strong></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-val="priest" id="priest-tab" class="nav-link" onclick="filterByRole('priest')">
+                        <span class="d-sm-block d-none"><strong>Priest</strong></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-val="parishioners" id="parishioners-tab" class="nav-link" onclick="filterByRole('parishioners')">
+                        <span class="d-sm-block d-none"><strong>Parishioners</strong></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-val="non_parishioners" id="non_parishioners-tab" class="nav-link" onclick="filterByRole('non_parishioners')">
+                        <span class="d-sm-block d-none"><strong>Non-parishioners</strong></span>
+                    </a>
+                </li>
+            </ul>
         </h4>
+        <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-success btn-sm" style="display: inline !important;">
+            Add Account
+        </a>
     </div>
     <!-- END panel-heading -->
     <!-- BEGIN panel-body -->
@@ -171,11 +202,7 @@
     </div>
     <!-- END panel-body -->
 </div>
-        <!-- BEGIN hljs-wrapper -->
-
-        <!-- END hljs-wrapper -->
-    </div>
-    <!-- END panel -->
+        <!-- END panel -->
     </div>
     
     <!-- Add Account Modal -->
@@ -518,6 +545,26 @@ $('#editAccountForm').on('submit', function(event) {
             console.error('Error updating user:', error);
         }
     });
+});
+
+$(document).ready(function() {
+    // Initialize the active tab
+    $('#all-tab').addClass('active-filter');
+
+    // Add click event listeners to the tabs
+    $('.nav-link').on('click', function() {
+        // Remove the active-filter class from all tabs
+        $('.nav-link').removeClass('active-filter');
+        // Add the active-filter class to the clicked tab
+        $(this).addClass('active-filter');
+        // Get the role from the data-val attribute
+        const role = $(this).data('val');
+        // Filter the list based on the selected role
+        filterByRole(role);
+    });
+
+    // Initial load
+    getList(null);
 });
 
 function filterByRole(role) {
