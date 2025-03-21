@@ -19,10 +19,14 @@ class AccountsController extends Controller
 
     public function users_list(Request $request)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 93e73b8e (filter styles and remove admin account from display)
     {
         $search = $request->input('search');
         $role = $request->input('role');
         $perPage = $request->input('perPage', 10); // Default to 10 items per page
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
         $page = $request->input('page', 1); // Default to page 1
@@ -60,9 +64,12 @@ class AccountsController extends Controller
     $role = $request->input('role');
     $perPage = $request->input('perPage', 10); // Default to 10 items per page
 >>>>>>> 67d91adb (added accounts filter and login validation)
+=======
+>>>>>>> 93e73b8e (filter styles and remove admin account from display)
 
-    $query = User::query();
+        $query = User::query();
 
+<<<<<<< HEAD
     if (!empty($search)) {
         $query->where(function ($q) use ($search) {
             $q->where('firstname', 'like', '%' . $search . '%')
@@ -70,16 +77,27 @@ class AccountsController extends Controller
               ->orWhere('role', 'like', '%' . $search . '%');
         });
 >>>>>>> Stashed changes
+=======
+        // Exclude admin accounts
+        $query->where('role', '!=', 'admin');
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('firstname', 'like', '%' . $search . '%')
+                ->orWhere('lastname', 'like', '%' . $search . '%')
+                ->orWhere('role', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($role && $role !== 'all') {
+            $query->where('role', $role);
+        }
+
+        $users = $query->paginate($perPage);
+
+        return UserResource::collection($users);
+>>>>>>> 93e73b8e (filter styles and remove admin account from display)
     }
-
-    if ($role && $role !== 'all') {
-        $query->where('role', $role);
-    }
-
-    $users = $query->paginate($perPage);
-
-    return UserResource::collection($users);
-}
 
     public function edit($userId)
     {
