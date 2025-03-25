@@ -1,14 +1,15 @@
 @extends('layouts.main')
 
 @push('style-file')
-    <style>
-        .is-invalid {
-            border-color: red;
-        }
-        .error {
-            color: red;
-        }
-    </style>
+<style>
+.is-invalid {
+    border-color: red;
+}
+
+.error {
+    color: red;
+}
+</style>
 @endpush
 
 @section('content')
@@ -59,52 +60,60 @@
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Groom name:</label>
-                            <input class="form-control" type="text" id="groom_name" name="groom_name" placeholder="Enter groom's name" required>
+                            <input class="form-control" type="text" id="groom_name" name="groom_name"
+                                placeholder="Enter groom's name" required>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Bride name:</label>
-                            <input class="form-control" type="text" id="bride_name" name="bride_name" placeholder="Enter bride's name" required>
+                            <input class="form-control" type="text" id="bride_name" name="bride_name"
+                                placeholder="Enter bride's name" required>
                         </div>
                     </div>
 
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Groom age:</label>
-                            <input class="form-control" type="number" id="groom_age" name="groom_age" placeholder="Enter groom's age" required>
+                            <input class="form-control" type="number" id="groom_age" name="groom_age"
+                                placeholder="Enter groom's age" required>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Bride age:</label>
-                            <input class="form-control" type="number" id="bride_age" name="bride_age" placeholder="Enter bride's age" required>
+                            <input class="form-control" type="number" id="bride_age" name="bride_age"
+                                placeholder="Enter bride's age" required>
                         </div>
                     </div>
 
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Groom address:</label>
-                            <input class="form-control" type="text" id="groom_address" name="groom_address" placeholder="Enter groom's address" required>
+                            <input class="form-control" type="text" id="groom_address" name="groom_address"
+                                placeholder="Enter groom's address" required>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Bride address:</label>
-                            <input class="form-control" type="text" id="bride_address" name="bride_address" placeholder="Enter bride's address" required>
+                            <input class="form-control" type="text" id="bride_address" name="bride_address"
+                                placeholder="Enter bride's address" required>
                         </div>
                     </div>
 
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Groom parents' name:</label>
-                            <input class="form-control" type="text" id="groom_parents" name="groom_parents" placeholder="Enter groom's parents' names" required>
+                            <input class="form-control" type="text" id="groom_parents" name="groom_parents"
+                                placeholder="Enter groom's parents' names" required>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="mb-10px">
                             <label class="form-label">Bride parents' name:</label>
-                            <input class="form-control" type="text" id="bride_parents" name="bride_parents" placeholder="Enter bride's parents' names" required>
+                            <input class="form-control" type="text" id="bride_parents" name="bride_parents"
+                                placeholder="Enter bride's parents' names" required>
                         </div>
                     </div>
                 </div>
@@ -123,30 +132,34 @@
 <script>
 $(document).ready(function() {
     $('#announcement_type').change(function() {
-        var selectedValue = $(this).val(); // Get the selected value
-        console.log('Selected announcement type: ' + selectedValue);
+        var selectedValue = $(this).val();
 
-        // Perform an action based on the selected value
-        if (selectedValue === 'public') {
-            location.href = "{{ route('public_announce') }}";
-        } else if (selectedValue === 'marriage') {
-            location.href = "{{ route('marriage_bann') }}";
-        } else if (selectedValue === 'project') {
-            location.href = "{{ route('project_financial') }}";
-        } else if (selectedValue === 'mass') {
-            location.href = "{{ route('public_announce') }}";
+        const routes = {
+            public: "{{ route('public_announce') }}",
+            marriage: "{{ route('marriage_bann') }}",
+            project: "{{ route('project_financial') }}",
+            mass: "{{ route('public_announce') }}"
+        };
+
+        if (routes[selectedValue]) {
+            location.href = routes[selectedValue];
         }
     });
+
     // Validate input fields
     function validateInput(input) {
-        if ($(input).val().trim() === "") {
-            $(input).addClass('is-invalid');
+        const $input = $(input);
+        
+        if ($input.prop('required') && $input.val().trim() === "") {
+            $input.addClass('is-invalid');
+            return false;
         } else {
-            $(input).removeClass('is-invalid');
+            $input.removeClass('is-invalid');
+            return true;
         }
     }
 
-    // On input change, remove invalid class
+    // On input change, validate and remove error class
     $('input, select').on('input change', function() {
         validateInput(this);
     });
@@ -155,14 +168,16 @@ $(document).ready(function() {
     $('#submit-announcement').click(function(e) {
         e.preventDefault();
 
-        // Validate inputs
         let isValid = true;
+
+        // Validate all input fields
         $('input, select').each(function() {
-            validateInput(this);
-            if ($(this).hasClass('is-invalid')) {
+            if (!validateInput(this)) {
                 isValid = false;
             }
         });
+
+        console.log('Form Valid:', isValid);
 
         if (isValid) {
             $.ajax({
@@ -172,16 +187,18 @@ $(document).ready(function() {
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                success: function(response) {
+                success: function() {
                     alert('Announcement created successfully!');
                     location.href = "{{ route('anouncements') }}";
                 },
-                error: function(xhr) {
+                error: function() {
                     alert('Error saving the announcement');
                 }
             });
-        } 
+        }
     });
 });
+
 </script>
+
 @endpush

@@ -22,6 +22,14 @@ class AccountsController extends Controller
         $search = $request->input('search');
         $role = $request->input('role');
         $perPage = $request->input('perPage', 10); // Default to 10 items per page
+<<<<<<< HEAD
+=======
+        $page = $request->input('page', 1); // Default to page 1
+    
+        $query = User::where('role', '!=', 'admin');
+    
+        if (!empty($search)) {
+>>>>>>> upstream/main
 
         $query = User::query();
 

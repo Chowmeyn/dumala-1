@@ -25,6 +25,53 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 	<!-- ================== BEGIN page-js ================== -->
 	<script src="{{ asset('assets/js/demo/login-v2.demo.js') }}"></script>
+	<style>
+		
+.no-data-container {
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    height: 100px;
+    /* Adjust height to suit your needs */
+    text-align: center;
+    /* Ensure text is centered inside the container */
+}
+
+.modal-content {
+    background-color: #f1f4e4;
+    color: #3d4b3e;
+    border-radius: 10px;
+    font-family: 'Arial', sans-serif;
+}
+
+.modal-title {
+    font-weight: bold;
+}
+
+.modal-body p {
+    margin-bottom: 8px;
+}
+
+.btn-success {
+    background-color: #2d5a27;
+    border-color: #2d5a27;
+}
+
+.btn-danger {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+.btn-success:hover {
+    background-color: #274d22;
+}
+
+.btn-danger:hover {
+    background-color: #a93226;
+}
+	</style>
 	<!-- ================== END page-js ================== -->
 
     	<!-- ================== BEGIN page-js ================== -->

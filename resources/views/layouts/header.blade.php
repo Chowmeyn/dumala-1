@@ -1,7 +1,12 @@
 <div id="header" class="app-header" data-bs-theme="dark">
     <!-- BEGIN navbar-header -->
     <div class="navbar-header">
+<<<<<<< HEAD
         <a href="/dashboard" class="navbar-brand">
+=======
+        <a href="/" class="navbar-brand">
+            <!-- Add the image logo here -->
+>>>>>>> upstream/main
             <img src="{{ asset('assets/img/logos-dumala-trans.png') }}" alt="Logo"
                 style="height: 100px; width: auto;" />
         </a>

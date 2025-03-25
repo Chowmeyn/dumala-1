@@ -52,7 +52,7 @@
                     <!-- Button container -->
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary w-100px me-5px">Confirm</button>
-                        <button type="submit" class="btn btn-danger w-100px">Cancel</button>
+                        <a href="/liturgical" class="btn btn-danger w-100px">Cancel</a>
                     </div>
                 </fieldset>
             </form>

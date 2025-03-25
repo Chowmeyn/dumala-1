@@ -12,7 +12,7 @@
                     <div class="menu-text">Home</div>
                 </a>
             </div>
-            @if(Auth::user()->role === 'secretary' || Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest' )
+            @if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest' )
             <div class="menu-item" id="accounts">
                 <a href="{{ route('accounts') }}" class="menu-link">
                     <div class="menu-icon">
@@ -22,6 +22,8 @@
                 </a>
             </div>
             @endif
+
+
             <div class="menu-item" id="requests">
                 <a href="{{ route('request') }}" class="menu-link">
                     <div class="menu-icon">

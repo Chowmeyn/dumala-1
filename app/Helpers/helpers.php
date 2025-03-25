@@ -19,14 +19,13 @@ if (!function_exists('format_date')) {
 
 if (!function_exists('get_all_priest')) {
     /**
-     * Format a date into 'Y-m-d' format.
+     * Retrieve all users with the role of 'priest' or 'parish_priest'.
      *
-     * @param string|null $date
-     * @return string|null
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     function get_all_priest()
     {
-        return User::where('role','priest')->get();
+        return \App\Models\User::whereIn('role', ['priest', 'parish_priest'])->get();
     }
 }
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DeclinedRequest;
 
 class RequestController extends Controller
 {
@@ -29,66 +30,82 @@ class RequestController extends Controller
         $month = $request->input('month');
         $date_range = $request->input('date_range');
         $perPage = 10; // Items per page
-
-        $query = DB::table('schedule_events_view');
+    
+        $query = DB::table('schedule_events_view')
+        ->leftJoin('declined_requests', 'schedule_events_view.schedule_id', '=', 'declined_requests.schedule_id')
+        ->select(
+            'schedule_events_view.*',
+            'declined_requests.reason as declined_reason',
+            'declined_requests.referred_priest_id as declined_priest_id', // Fix here
+            'declined_requests.created_at as declined_at'
+        );
+    
         $id_ = Auth::user()->id;
-
+    
         if (Auth::user()->role != 'admin' && Auth::user()->role != 'parish_priest') {
-
             $query->where(function ($q) use ($id_) {
-                $q->where('created_by', $id_)
-                ->orWhere('assign_to', $id_);
+                $q->where('schedule_events_view.created_by', $id_)
+                  ->orWhere('schedule_events_view.assign_to', $id_);
             });  
         }
-
+    
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('created_by_name', 'like', '%' . $search . '%')
-                ->orWhere('role', 'like', '%' . $search . '%')
-                ->orWhere(function ($query) use ($search) {
-                    $query->whereNotNull('assign_to')
-                          ->where('assign_to', $search);
-                });
+                $q->where('schedule_events_view.created_by_name', 'like', '%' . $search . '%')
+                    ->orWhere('schedule_events_view.role', 'like', '%' . $search . '%')
+                    ->orWhere(function ($query) use ($search) {
+                        $query->whereNotNull('schedule_events_view.assign_to')
+                              ->where('schedule_events_view.assign_to', $search);
+                    });
             });
         }
-
-
+    
         if ($year) {
-            $query->where(function ($q) use ($year) {
-                $q->where('year', $year);
-            });
+            $query->where('schedule_events_view.year', $year);
         }
-
+    
         if ($month) {
-            $query->where(function ($q) use ($month) {
-                $q->where('month', $month);
-            });
+            $query->where('schedule_events_view.month', $month);
         }
-
+    
         if ($date_range) {
-            // Split the date range string into start and end dates
             list($start_date, $end_date) = explode(' - ', $date_range);
-            
-            // Convert the date strings into 'Y-m-d' format (MySQL-compatible)
             $start_date = date('Y-m-d', strtotime($start_date));
             $end_date = date('Y-m-d', strtotime($end_date));
-        
-            $query->where(function ($q) use ($start_date, $end_date) {
-                $q->whereBetween('s_date', [$start_date, $end_date]);
-            });
+    
+            $query->whereBetween('schedule_events_view.s_date', [$start_date, $end_date]);
         }
-
-        $total = $query->count(); // Get total count for pagination
+    
+        $total = $query->count();
         $sched = $query->skip(($page - 1) * $perPage)
                     ->take($perPage)
                     ->get();
-
+    
         return response()->json([
             'data' => $sched,
             'total' => $total,
             'current_page' => $page,
             'per_page' => $perPage
         ]);
+    }
+
+    public function declineRequest(Request $request, $id)
+    {
+        $schedule = Schedule::find($id);
+        if (!$schedule) {
+            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+        }
+
+        DeclinedRequest::create([
+            'schedule_id' => $id,
+            'referred_priest_id' => $request->priest_id,
+            'reason' => $request->reason,
+        ]);
+
+        $schedule->status = 3; // Assuming 2 means declined
+        $schedule->save();
+
+        return response()->json(['success' => true, 'message' => 'Request declined successfully.']);
     }
 
 

@@ -25,14 +25,14 @@
     <div class="panel panel-inverse">
 
 
-       
+
         <!-- END panel-heading -->
         <!-- BEGIN panel-body -->
         <div class="panel-body">
             <!--  -->
             @if(Auth::user()->role === 'parishioners' || Auth::user()->role === 'non_parishioners')
             <a href="#modal-create-own-sched" data-bs-toggle="modal" class="btn btn-primary btn-sm me-1 mb-1">Create
-            schedule</a>
+                schedule</a>
             @endif
             <div class="input-group mt-2">
                 <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role"
@@ -47,6 +47,7 @@
                         <th>Name</th>
                         <th>Purpose</th>
                         <th>Date</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,26 +73,31 @@
                 <h4 class="modal-title">Decline Request</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label" for="exampleInputEmail1">Refer Another Priest:</label>
-                    <select class="form-select" id="priest-select">
-                        <option value="" selected>Choose a priest</option>
-                        @foreach(get_all_priest() as $priest)
-                        <option value="{{ $priest->id }}">{{ $priest->name }}</option>
-                        @endforeach
+            <form id="decline-form">
+                <div class="modal-body">
+                    <input type="hidden" id="schedule_id" name="schedule_id"> <!-- Hidden input for schedule ID -->
 
-                    </select>
+                    <div class="mb-3">
+                        <label class="form-label">Refer Another Priest:</label>
+                        <select class="form-select" id="priest-select" name="priest_id">
+                            <option value="" selected>Choose a priest</option>
+                            @foreach(get_all_priest() as $priest)
+                            <option value="{{ $priest->id }}">{{ $priest->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Add a reason:</label>
+                        <textarea id="editor-text" name="reason" class="form-control"></textarea>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label" for="editor-text">Add a reason:</label>
-                    <textarea id="editor-text" name="editor-text"></textarea>
+
+                <div class="modal-footer">
+                    <a href="javascript:;" class="btn btn-white" data-bs-dismiss="modal">Close</a>
+                    <button type="submit" class="btn btn-danger">Decline</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <a href="javascript:;" class="btn btn-white" data-bs-dismiss="modal">Close</a>
-                <a href="javascript:;" class="btn btn-success">Action</a>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -173,7 +179,17 @@
                                 <span class="input-group-text input-group-addon"><i class="fa fa-clock"></i></span>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Request priest:</label>
+                            <select class="form-select" id="priest-select">
+                                <option value="" selected>Choose a priest</option>
+                                @foreach(get_all_priest() as $priest)
 
+                                <option value="{{ $priest->id }}">{{ $priest->name }}</option>
+                                @endforeach
+
+                            </select>
+                        </div>
                     </div>
                     <div class="col-7">
                         <div class="mb-3">
@@ -207,7 +223,7 @@
                         <div class="mb-3">
                             <label class="form-label">If others, please specify:</label>
                             <input class="form-control form-control-sm others" type="text"
-                                placeholder="if others, please specify..." />
+                                placeholder="if others, please specify..." disabled />
                         </div>
                     </div>
                 </div>
@@ -228,6 +244,17 @@
 @push('scripts')
 
 <script>
+    $(document).ready(function() {
+    $("input[type='radio'][name='flexRadioDefault']").on("change", function() {
+        let selectedValue = $(this).data("val"); // Get the selected radio value
+
+        if (selectedValue.toLowerCase() === "others") {
+            $(".others").prop("disabled", false).focus(); // Enable input field
+        } else {
+            $(".others").prop("disabled", true).val(""); // Disable and clear input field
+        }
+    });
+});
 $('#requests').addClass('active');
 let currentPage = 1;
 getList();
@@ -242,6 +269,9 @@ $(document).on('click', '#save-schedule', function() {
         liturgical_id: $('input[name="flexRadioDefault"]:checked').attr('data-id'),
         others: $('.others').val(),
         sched_type: 'own_sched',
+        assign_to: $('#priest-select').val(),
+        // $('#priest-select').val()
+        // priest-select
         assign_to: '',
         _token: $('meta[name="csrf-token"]').attr('content'),
     };
@@ -352,21 +382,33 @@ function getList(search = '', page = 1) {
 
             // Populate table rows
             data.forEach((item, index) => {
+
+                console.log(item);
+
                 const rowId = `detailsRow${index + 1}`;
+                const arrowId = `arrow${index + 1}`;
                 tbody.append(`
                     <!-- Main Row -->
-                    <tr data-bs-toggle="collapse" data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
+                    <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
+                        data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
                         <td>
                             <img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" />
                         </td>
                         <td style="padding-top: 20px;">${item.created_by_name}</td>
                         <td style="padding-top: 20px;">${item.purpose}</td>
-                        <td style="padding-top: 20px;">${item.date}</td>
-                        
+                        <td style="padding-top: 20px;">
+                            ${item.date}
+                            
+                         
+                        </td>
+                        <td style="padding-top: 20px;">
+                            
+                            <span id="${arrowId}" class="ms-2 toggle-arrow"><i class="fa fa-ellipsis-h fs-30px"></i></span>  <!-- ▼ Down Arrow -->
+                        </td>
                     </tr>
                     <!-- Collapsible Content -->
                     <tr id="${rowId}" class="collapse fade">
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="p-1 bg-light">
                                 <div class="d-flex p-1">
                                     <div class="flex-1">
@@ -377,35 +419,45 @@ function getList(search = '', page = 1) {
                                                     <td style="border: none !important;">${item.assign_to_name || 'N/A'}</td>
                                                     <td style="border: none !important;"><strong>Time:</strong></td>
                                                     <td style="border: none !important;">${item.time_from} - ${item.time_to}</td>
-                                                    
                                                 </tr>
                                                 <tr>
                                                     <td style="border: none !important;"><strong>Venue:</strong></td>
                                                     <td style="border: none !important;">${item.venue || 'N/A'}</td>
                                                     <td style="border: none !important;"><strong>Status:</strong></td>
-                                                    <td style="border: none !important;">${item.status === 1 ? '<span class="badge bg-yellow text-black">Pending</span>' : '<span class="badge bg-success">Accepted by priest</span>'}</td>
-                                                    
+                                                    <td style="border: none !important;">
+                                                        ${item.status === 1 
+                                                            ? '<span class="badge bg-yellow text-black">Pending</span>' 
+                                                            : item.status === 2 
+                                                                ? '<span class="badge bg-primary">Accepted</span>' 
+                                                                : item.status === 3 
+                                                                    ? '<span class="badge bg-danger">Declined</span>' 
+                                                                    : item.status === 4 
+                                                                        ? '<span class="badge bg-info text-black">Complete</span>' 
+                                                                        : item.status === 5 
+                                                                            ? '<span class="badge bg-secondary">Archived</span>' 
+                                                                            : '<span class="badge bg-success">Accepted by priest</span>' }
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="border: none !important;"><strong>Address:</strong></td>
                                                     <td style="border: none !important;">${item.address || 'N/A'}</td>
-                                                    
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        
                                         ${!item.assign_to_name ? `
                                              <p class="mb-0 d-flex justify-content-end">
-                                                <a href="javascript:;" class="btn btn-sm btn-primary"   onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
+                                                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
                                             </p>
                                         ` : `
                                             <p class="mb-0 d-flex justify-content-end">
-                                                <a href="javascript:;" class="btn btn-sm btn-success me-5px">Accept</a>
+                                                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id})">Accept</a>
                                                 <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline"
                                                     onclick="onclickDecline(${item.schedule_id})">Decline</a>
-                                                <a href="javascript:;" class="btn btn-sm btn-primary">Assign another priest</a>
+                                                ${!item.declined_priest_id ? `` : `<?php if (auth()->user()->role === 'admin' || auth()->user()->role === 'parish_priest'): ?><a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a> <?php endif; ?>`}
+                                               
                                             </p>
                                         `}
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -435,10 +487,15 @@ function getList(search = '', page = 1) {
 
 function onclickDecline(id) {
 
+    console.log(id);
+
+
     $('#modal-dialog-decline').modal('show');
     clearEditorContent();
 
     $('#priest-select').val('');
+
+    $('#schedule_id').val(id);
 
 
 }
@@ -447,7 +504,6 @@ function onclickAssignToPriest(id) {
 
     $('#modal-dialog-assign-to-priest').modal('show');
     $('.assign_post').attr('data-id', id);
-
 
 }
 
@@ -493,6 +549,48 @@ function onclickAssignPost(id) {
 
 }
 
+function onclickAccept(id, sched_id) {
+
+
+    $.ajax({
+        url: `/assign_priest`,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            user_id: id,
+            sched_id: sched_id
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+
+            if (response.status == 1) {
+                $('#modal-dialog-assign-to-priest').modal('hide');
+                message({
+                    title: 'Success!',
+                    message: response.message,
+                    icon: 'success'
+                });
+                getList();
+            } else {
+                message({
+                    title: 'Error!',
+                    message: response.message,
+                    icon: 'error'
+                });
+            }
+
+        },
+        error: function(xhr, status, error) {
+            console.error('Error updating user:', error);
+        }
+    });
+
+
+}
+
+
 
 function updatePagination(total, currentPage, perPage) {
     const pagination = $('.pagination');
@@ -520,7 +618,7 @@ function updatePagination(total, currentPage, perPage) {
             <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage + 1})">»</a>
         </div>
     `);
-    
+
 }
 
 
@@ -537,5 +635,64 @@ $("#timepicker-from").timepicker();
 $("#timepicker-to").timepicker();
 $("#timepicker-mass-from").timepicker();
 $("#timepicker-mass-to").timepicker();
+
+$(document).ready(function() {
+    $("#decline-form").on("submit", function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        let scheduleId = $("#schedule_id").val();
+        let priestId = $("#priest-select").val();
+        let reason = $("#editor-text").val().trim();
+
+        // Clear previous errors
+        $(".error-message").remove();
+
+        // Validation
+        let hasError = false;
+
+        if (!priestId) {
+            $("#priest-select").after(
+                '<small class="text-danger error-message">Please select a priest.</small>');
+            hasError = true;
+        }
+        if (!reason) {
+            $("#editor-text").after(
+                '<small class="text-danger error-message">Reason is required.</small>');
+            hasError = true;
+        }
+
+        if (hasError) {
+            return; // Stop submission if validation fails
+        }
+
+        $.ajax({
+            url: `/request/${scheduleId}/decline`,
+            method: "POST",
+            data: {
+                priest_id: priestId,
+                reason: reason,
+                _token: $('meta[name="csrf-token"]').attr("content")
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert("Request declined successfully.");
+                    $("#modal-dialog-decline").modal("hide");
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr) {
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    // Set Schedule ID when opening modal
+    $("#modal-dialog-decline").on("show.bs.modal", function(e) {
+        let scheduleId = $(e.relatedTarget).data("schedule-id");
+        $("#schedule_id").val(scheduleId);
+    });
+});
 </script>
 @endpush

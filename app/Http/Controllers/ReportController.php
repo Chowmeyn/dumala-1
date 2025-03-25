@@ -90,16 +90,12 @@ class ReportController extends Controller
     }
     public function storeMarriage(Request $request)
     {
-
         $data = Announcement::where('announcement_type', $request->announcement_type)
-        ->orderBy('parent', 'desc')
-        ->first();
-        $parent = 1;
-        if ($data) {
-            $parent = (int)$data->parent + 1;
-        }
-
-        Marriage::create([
+            ->orderBy('parent', 'desc')
+            ->first();
+        $parent = $data ? (int)$data->parent + 1 : 1;
+    
+        $marriage = Marriage::create([
             'announcement_type' => $request->announcement_type,
             'marriage_bann' => $request->marriage_bann,
             'groom_name' => $request->groom_name,
@@ -113,39 +109,102 @@ class ReportController extends Controller
             'parent' => $parent,
             'status' => 'is_pending',
         ]);
-
-        
-        $marriageEntries = '<table style="width: 100%; border-collapse: collapse;">';
-        $marriageEntries .= '<tr>';
-        $marriageEntries .= '<td style="width: 50%; vertical-align: top;">';
-        $marriageEntries .= '<h4>Groom Information</h4>';
-        $marriageEntries .= '<strong>Groom name:</strong> '. $request->groom_name .'<br>';
-        $marriageEntries .= '<strong>Groom age:</strong> '. $request->groom_age .'<br>';
-        $marriageEntries .= '<strong>Groom address:</strong> '. $request->groom_address .'<br>';
-        $marriageEntries .= '<strong>Groom parents name:</strong> '. $request->groom_parents .'<br>';
-        $marriageEntries .= '</td>'; // Close groom's info cell
-        
-        $marriageEntries .= '<td style="width: 50%; vertical-align: top;">';
-        $marriageEntries .= '<h4>Bride Information</h4>';
-        $marriageEntries .= '<strong>Bride name:</strong> '. $request->bride_name .'<br>';
-        $marriageEntries .= '<strong>Bride age:</strong> '. $request->bride_age .'<br>';
-        $marriageEntries .= '<strong>Bride address:</strong> '. $request->bride_address .'<br>';
-        $marriageEntries .= '<strong>Bride parents name:</strong> '. $request->bride_parents .'<br>';
-        $marriageEntries .= '</td>'; // Close bride's info cell
-        $marriageEntries .= '</tr>'; // Close row
-        $marriageEntries .= '</table>'; // Close table
-
+    
+        // Generate marriage entry content
+        $marriageEntries = $this->generateMarriageContent($request);
+    
         Announcement::create([
             'title' => $request->marriage_bann,
-            'content' => $marriageEntries, 
+            'content' => $marriageEntries,
             'parent' => $parent,
             'announcement_type' => $request->announcement_type,
             'status' => 'is_pending',
         ]);
-
-        return response()->json(['success' => 'Announcement saved successfully!']);
+    
+        return response()->json(['success' => 'Announcement saved successfully!', 'marriage' => $marriage]);
+    }
+    
+    /**
+     * Update an existing marriage announcement.
+     */
+    public function updateMarriage(Request $request, $id)
+    {
+        $marriage = Marriage::findOrFail($id);
+    
+        $marriage->update([
+            'announcement_type' => $request->announcement_type,
+            'marriage_bann' => $request->marriage_bann,
+            'groom_name' => $request->groom_name,
+            'bride_name' => $request->bride_name,
+            'groom_age' => $request->groom_age,
+            'bride_age' => $request->bride_age,
+            'groom_address' => $request->groom_address,
+            'bride_address' => $request->bride_address,
+            'groom_parents' => $request->groom_parents,
+            'bride_parents' => $request->bride_parents,
+            'status' => $request->status, // Allow status update
+        ]);
+    
+        // Update related Announcement
+        $announcement = Announcement::where('parent', $marriage->parent)
+            ->where('announcement_type', $request->announcement_type)
+            ->first();
+    
+        if ($announcement) {
+            $announcement->update([
+                'title' => $request->marriage_bann,
+                'content' => $this->generateMarriageContent($request),
+                'status' => $request->status,
+            ]);
+        }
+    
+        return response()->json(['success' => 'Announcement updated '.$marriage->parent.' - '.$request->announcement_type.' successfully!', 'marriage' => $marriage]);
+    }
+    
+    /**
+     * Generate marriage entry content as an HTML table.
+     */
+    private function generateMarriageContent($request)
+    {
+        return '<table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; vertical-align: top;">
+                    <h4>Groom Information</h4>
+                    <strong>Groom name:</strong> ' . $request->groom_name . '<br>
+                    <strong>Groom age:</strong> ' . $request->groom_age . '<br>
+                    <strong>Groom address:</strong> ' . $request->groom_address . '<br>
+                    <strong>Groom parents name:</strong> ' . $request->groom_parents . '<br>
+                </td>
+                <td style="width: 50%; vertical-align: top;">
+                    <h4>Bride Information</h4>
+                    <strong>Bride name:</strong> ' . $request->bride_name . '<br>
+                    <strong>Bride age:</strong> ' . $request->bride_age . '<br>
+                    <strong>Bride address:</strong> ' . $request->bride_address . '<br>
+                    <strong>Bride parents name:</strong> ' . $request->bride_parents . '<br>
+                </td>
+            </tr>
+        </table>';
     }
 
+
+    public function editPublic($id)
+    {
+        $announcement = Announcement::findOrFail($id);
+        return view('pages.create_announcement.public_announce_edit', compact('announcement'));
+    }
+
+    public function updatePublic(Request $request, $id)
+    {
+        $announcement = Announcement::findOrFail($id);
+        $announcement->update([
+            'title' => $request->title,
+            'content' => $request->content,
+            'announcement_type' => $request->announcement_type,
+            'status' => $request->status,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
 
     public function storePublic(Request $request)
     {
@@ -170,6 +229,14 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      */
+
+    public function editMarriage($id)
+    {
+        $announcement = Marriage::findOrFail($id);
+        return view('pages.create_announcement.marriage_edit', compact('announcement'));
+    }
+
+
     public function show(string $id)
     {
         //
@@ -197,5 +264,59 @@ class ReportController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function editDonor($id)
+    {
+        // Fetch the announcement
+        $announcement = Announcement::findOrFail($id);
+
+        // Fetch the donors related to this announcement
+        $donors = Donor::where('parent', $announcement->parent)->get();
+
+        return view('pages.create_announcement.project_financial_edit', compact('announcement', 'donors'));
+    }
+
+
+
+    public function updateDonor(Request $request, $id)
+    {
+        $announcement = Announcement::findOrFail($id);
+
+        // Update Announcement details
+        $announcement->update([
+            'title' => $request->project_name,
+            'announcement_type' => $request->announcement_type,
+            'status' => $request->status,
+        ]);
+
+        // Delete existing donors for this announcement
+        Donor::where('parent', $announcement->parent)->delete();
+
+        // Store updated donors
+        $donorEntries = [];
+        $short = 1;
+
+        foreach ($request->donors as $donor) {
+            Donor::create([
+                'announcement_type' => $request->announcement_type,
+                'project_name' => $request->project_name,
+                'donor_name' => $donor['donor_name'],
+                'donated_amount' => $donor['donated_amount'],
+                'parent' => $announcement->parent,
+                'short' => $short++,
+                'status' => $request->status,
+            ]);
+
+            // Add donor data for announcement content
+            $donorEntries[] = '<li><strong>Donor name:</strong> ' . $donor['donor_name'] . ' - ₱ ' . number_format($donor['donated_amount'], 2) . '</li>';
+        }
+
+        // Update Announcement content
+        $announcement->update([
+            'content' => '<ul>' . implode('', $donorEntries) . '</ul>',
+        ]);
+
+        return response()->json(['message' => 'Announcement updated successfully!']);
     }
 }

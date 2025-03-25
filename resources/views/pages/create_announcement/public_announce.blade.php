@@ -92,23 +92,48 @@ $('#announcement-form').on('submit', function(e) {
 
     if (title == '') {
         validateInput('#title');
+        message({
+                    title: 'Error!',
+                    message: "Title should not be empty!",
+                    icon: 'error'
+                });
         if ($('#title').hasClass('is-invalid')) {
             isValid = false; // If any input is invalid, set isValid to false
 
         }
     } else if (content == '') {
         validateInput('.content_text');
+        message({
+                    title: 'Error!',
+                    message: "Content should not be empty!",
+                    icon: 'error'
+                });
         if ($('.content_text').hasClass('is-invalid')) {
             isValid = false; // If any input is invalid, set isValid to false
 
         }
     } else if (announcementType == '') {
         validateInput('#announcement_type');
+        message({
+                    title: 'Error!',
+                    message: "Announcement type",
+                    icon: 'error'
+                });
         if ($('#announcement_type').hasClass('is-invalid')) {
             isValid = false; // If any input is invalid, set isValid to false
 
         }
     }
+
+    // message({
+    //                 title: 'Success!',
+    //                 message: response.message,
+    //                 icon: 'success'
+    //             });
+
+    //             setTimeout(() => {
+    //                 location.reload();
+    //             }, 2000);
 
     if (isValid) {
 
