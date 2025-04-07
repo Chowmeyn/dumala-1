@@ -8,7 +8,16 @@
 
 @section('content')
 
+<style>
+    .table {
+    border: none !important;
+}
 
+.table th,
+.table td {
+    border: none !important;
+}
+</style>
 <!-- END page-header -->
 
 <!-- BEGIN row -->
@@ -30,7 +39,8 @@
         <!-- BEGIN panel-body -->
         <div class="panel-body">
             <!--  -->
-            @if(Auth::user()->role === 'parishioners' || Auth::user()->role === 'non_parishioners')
+            @if(Auth::user()->role === 'parishioners' || Auth::user()->role === 'non_parishioners' || Auth::user()->role
+            === 'secretary')
             <a href="#modal-create-own-sched" data-bs-toggle="modal" class="btn btn-primary btn-sm me-1 mb-1">Create
                 schedule</a>
             @endif
@@ -244,7 +254,7 @@
 @push('scripts')
 
 <script>
-    $(document).ready(function() {
+$(document).ready(function() {
     $("input[type='radio'][name='flexRadioDefault']").on("change", function() {
         let selectedValue = $(this).data("val"); // Get the selected radio value
 
@@ -285,7 +295,8 @@ $(document).on('click', '#save-schedule', function() {
             location.reload(); // Reload the page or update the DOM dynamically
         },
         error: function(xhr) {
-            alert('An error occurred: ' + xhr.responseText);
+            console.log(xhr);
+            alert(xhr.responseJSON.message);
         },
     });
 });
@@ -353,25 +364,18 @@ function populateEditorWithData(data) {
 
 function getList(search = '', page = 1) {
     currentPage = page; // Update current page
+    
     $.ajax({
         url: '/list-request',
         method: 'GET',
         dataType: 'json',
-        data: {
-            search: search,
-            page: page
-        },
+        data: { search, page },
         success: function(response) {
-            const {
-                data,
-                total,
-                current_page,
-                per_page
-            } = response;
+            const { data, total, current_page, per_page } = response;
             const tbody = $('table.table tbody');
             tbody.empty();
 
-            if (data.length === 0) {
+            if (!data.length) {
                 tbody.append(`
                     <tr>
                         <td colspan="4" class="text-center">No data available.</td>
@@ -380,100 +384,117 @@ function getList(search = '', page = 1) {
                 return;
             }
 
-            // Populate table rows
             data.forEach((item, index) => {
-
                 console.log(item);
 
                 const rowId = `detailsRow${index + 1}`;
                 const arrowId = `arrow${index + 1}`;
-                tbody.append(`
-                    <!-- Main Row -->
-                    <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
-                        data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
-                        <td>
-                            <img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" />
-                        </td>
-                        <td style="padding-top: 20px;">${item.created_by_name}</td>
-                        <td style="padding-top: 20px;">${item.purpose}</td>
-                        <td style="padding-top: 20px;">
-                            ${item.date}
-                            
-                         
-                        </td>
-                        <td style="padding-top: 20px;">
-                            
-                            <span id="${arrowId}" class="ms-2 toggle-arrow"><i class="fa fa-ellipsis-h fs-30px"></i></span>  <!-- ▼ Down Arrow -->
-                        </td>
-                    </tr>
-                    <!-- Collapsible Content -->
-                    <tr id="${rowId}" class="collapse fade">
-                        <td colspan="5">
-                            <div class="p-1 bg-light">
-                                <div class="d-flex p-1">
-                                    <div class="flex-1">
-                                        <table class="table mb-2" style="border: none !important;">
-                                            <tbody>
-                                                <tr>
-                                                    <td style="border: none !important;"><strong>Requested Priest:</strong></td>
-                                                    <td style="border: none !important;">${item.assign_to_name || 'N/A'}</td>
-                                                    <td style="border: none !important;"><strong>Time:</strong></td>
-                                                    <td style="border: none !important;">${item.time_from} - ${item.time_to}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="border: none !important;"><strong>Venue:</strong></td>
-                                                    <td style="border: none !important;">${item.venue || 'N/A'}</td>
-                                                    <td style="border: none !important;"><strong>Status:</strong></td>
-                                                    <td style="border: none !important;">
-                                                        ${item.status === 1 
-                                                            ? '<span class="badge bg-yellow text-black">Pending</span>' 
-                                                            : item.status === 2 
-                                                                ? '<span class="badge bg-primary">Accepted</span>' 
-                                                                : item.status === 3 
-                                                                    ? '<span class="badge bg-danger">Declined</span>' 
-                                                                    : item.status === 4 
-                                                                        ? '<span class="badge bg-info text-black">Complete</span>' 
-                                                                        : item.status === 5 
-                                                                            ? '<span class="badge bg-secondary">Archived</span>' 
-                                                                            : '<span class="badge bg-success">Accepted by priest</span>' }
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="border: none !important;"><strong>Address:</strong></td>
-                                                    <td style="border: none !important;">${item.address || 'N/A'}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        
-                                        ${!item.assign_to_name ? `
-                                             <p class="mb-0 d-flex justify-content-end">
-                                                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
-                                            </p>
-                                        ` : `
-                                            <p class="mb-0 d-flex justify-content-end">
-                                                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id})">Accept</a>
-                                                <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline"
-                                                    onclick="onclickDecline(${item.schedule_id})">Decline</a>
-                                                ${!item.declined_priest_id ? `` : `<?php if (auth()->user()->role === 'admin' || auth()->user()->role === 'parish_priest'): ?><a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a> <?php endif; ?>`}
-                                               
-                                            </p>
-                                        `}
+                const userRole = "<?= Auth::user()->role ?>";
+                const isAdminOrPriest = userRole === "admin" || userRole === "parish_priest" || userRole === "priest";
+                
+                if ((item.status == 2 && isAdminOrPriest) || (item.status != 2 && (userRole === "priest" || userRole === "admin"))) {
+                    tbody.append(`
+                        <!-- Main Row -->
+                        <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
+                            data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
+                            <td><img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" /></td>
+                            <td style="padding-top: 20px;">${item.created_by_name}</td>
+                            <td style="padding-top: 20px;">${item.purpose}</td>
+                            <td style="padding-top: 20px;">${item.date}</td>
+                            <td style="padding-top: 20px;">
+                                <span id="${arrowId}" class="ms-2 toggle-arrow"><i class="fa fa-ellipsis-h fs-30px"></i></span>
+                            </td>
+                        </tr>
+                        <!-- Collapsible Content -->
+                        <tr id="${rowId}" class="collapse fade">
+                            <td colspan="5">
+                                <div class="p-1 bg-light">
+                                    <div class="d-flex p-1">
+                                        <div class="flex-1">
+                                            <table class="table mb-2" style="border: none !important;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>Requested Priest:</strong></td>
+                                                        <td>${item.assign_to_name || 'N/A'}</td>
+                                                        <td><strong>Time:</strong></td>
+                                                        <td>${item.time_from} - ${item.time_to}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Venue:</strong></td>
+                                                        <td>${item.venue || 'N/A'}</td>
+                                                        <td><strong>Status:</strong></td>
+                                                        <td>${getStatusBadge(item.status, item.role_model)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Address:</strong></td>
+                                                        <td>${item.address || 'N/A'}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            ${getActionButtons(item, userRole)}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                `);
-            });
+                            </td>
+                        </tr>
+                    `);
+                }
 
-            // Update pagination
+                if (userRole === 'secretary') {
+                    tbody.append(`
+                        <!-- Main Row -->
+                        <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
+                            data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
+                            <td><img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" /></td>
+                            <td style="padding-top: 20px;">${item.created_by_name}</td>
+                            <td style="padding-top: 20px;">${item.purpose}</td>
+                            <td style="padding-top: 20px;">${item.date}</td>
+                            <td style="padding-top: 20px;">
+                                <span id="${arrowId}" class="ms-2 toggle-arrow"><i class="fa fa-ellipsis-h fs-30px"></i></span>
+                            </td>
+                        </tr>
+                        <!-- Collapsible Content -->
+                        <tr id="${rowId}" class="collapse fade">
+                            <td colspan="5">
+                                <div class="p-1 bg-light">
+                                    <div class="d-flex p-1">
+                                        <div class="flex-1">
+                                            <table class="table mb-2" style="border: none !important;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>Requested Priest:</strong></td>
+                                                        <td>${item.assign_to_name || 'N/A'}</td>
+                                                        <td><strong>Time:</strong></td>
+                                                        <td>${item.time_from} - ${item.time_to}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Venue:</strong></td>
+                                                        <td>${item.venue || 'N/A'}</td>
+                                                        <td><strong>Status:</strong></td>
+                                                        <td>${getStatusBadge(item.status, item.role_model)}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Address:</strong></td>
+                                                        <td>${item.address || 'N/A'}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            ${getActionButtons(item, userRole)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                }
+            });
+            
             updatePagination(total, current_page, per_page);
         },
         error: function(xhr, status, error) {
             console.error('AJAX Error:', error);
             const tbody = $('table.table tbody');
-            tbody.empty();
-            tbody.append(`
+            tbody.empty().append(`
                 <tr>
                     <td colspan="4" class="text-center">An error occurred while fetching data.</td>
                 </tr>
@@ -481,6 +502,38 @@ function getList(search = '', page = 1) {
         }
     });
 }
+
+function getStatusBadge(status,role) {
+    const statuses = {
+        1: '<span class="badge bg-yellow text-black">Pending</span>',
+        2: '<span class="badge bg-primary">Accepted by '+role+'</span>',
+        3: '<span class="badge bg-danger">Declined</span>',
+        4: '<span class="badge bg-info text-black">Complete</span>',
+        5: '<span class="badge bg-secondary">Archived</span>',
+        default: '<span class="badge bg-success">Accepted by priest</span>'
+    };
+    return statuses[status] || statuses.default;
+}
+
+function getActionButtons(item, userRole) {
+    if (!item.assign_to_name) {
+        return `
+            <p class="mb-0 d-flex justify-content-end">
+                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
+            </p>
+        `;
+    }
+    return `
+        <p class="mb-0 d-flex justify-content-end">
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id},2)">Accept</a>
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
+            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+            ` : ''}
+        </p>
+    `;
+}
+
 
 
 
@@ -549,7 +602,7 @@ function onclickAssignPost(id) {
 
 }
 
-function onclickAccept(id, sched_id) {
+function onclickAccept(id, sched_id,status=1) {
 
 
     $.ajax({
@@ -558,7 +611,8 @@ function onclickAccept(id, sched_id) {
         dataType: 'json',
         data: {
             user_id: id,
-            sched_id: sched_id
+            sched_id: sched_id,
+            status: status,
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

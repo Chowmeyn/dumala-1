@@ -190,7 +190,7 @@ class ScheduleController extends Controller
 
             $sched->assign_to_name = ($user->prefix == '') ? $user->firstname . ' ' . $user->lastname : $user->prefix . '.' . ' ' . $user->firstname . ' ' . $user->lastname;
             $sched->is_assign = '1';
-            $sched->status = '2';
+            $sched->status = $request->input('status',1);
 
             $sched->save();
 
@@ -264,11 +264,23 @@ class ScheduleController extends Controller
         $isUpdate = !empty($event_id);
 
         $sched_type = $request->input('sched_type');
-       
 
         $time_from_24 = date('H:i:s', strtotime($request->input('time_from')));
         $time_to_24 = date('H:i:s', strtotime($request->input('time_to')));
         $date_now = $request->input('date');
+
+        // Check if the date and time are already taken with status "accepted by parish priest"
+        $existingSchedule = Schedule::where('date', $date_now)
+            ->where('time_from', $time_from_24)
+            ->where('time_to', $time_to_24)
+            ->where('status', '2')
+            ->first();
+
+        if ($existingSchedule) {
+            return response()->json([
+                'message' => 'Date and time is taken'
+            ], 400);
+        }
 
         if ($sched_type != 'mass_sched') {
             $validated = $request->validate([
@@ -278,7 +290,6 @@ class ScheduleController extends Controller
                 'others' => 'nullable|string|max:255',
             ]);
         }
-
 
         $validated['date'] = $date_now;
         $validated['time_from'] = $time_from_24;
@@ -348,6 +359,7 @@ class ScheduleController extends Controller
             'message' => $isUpdate ? 'Schedule updated successfully!' : 'Schedule created successfully!'
         ], 200);
     }
+
 
     public function completeSched(Request $request){
         $schId = $request->input('sched_id');

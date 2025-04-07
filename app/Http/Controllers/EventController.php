@@ -6,14 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
-    
+
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
-          
+
             'title' => 'required|string|max:255',
             'start' => 'required|date',
             'end' => 'nullable|date',
@@ -36,32 +37,12 @@ class EventController extends Controller
     }
 
 
-    // public function getEvents()
-    // {
-    //     $events = Event::all();
-    
-    //     // Rename the fields
-    //     $renamedEvents = $events->map(function ($event) {
-    //         return [
-    //             'id' => $event->id,
-    //             'title' => $event->title,
-    //             'start' => $event->start ? date('Y-m-d H:i:s', strtotime($event->start)) : null,
-    //             'end' => $event->end ? date('Y-m-d H:i:s', strtotime($event->end)) : null,
-    //             'color' => $event->color,
-    //             'schedule_id' => $event->schedule_id,
-    //             'start_time' => $event->start ? date('Y-m-d H:i:s', strtotime($event->start)) : null,
-    //             'end_time' => $event->end ? date('Y-m-d H:i:s', strtotime($event->end)) : null,
-    //         ];
-    //     });
-    
-    //     return response()->json($renamedEvents);
-    // }
-
-
-    public function getEvents()
+    public function getEvents(Request $request)
     {
+        $selectedIds = $request->input('ARRAY', []);  // Get the array of selected IDs, default to an empty array
+
         $events = DB::table('schedules AS s')
-            ->where('s.status', '!=', 5) // Corrected `whereNot` to `where`
+            ->where('s.status', '!=', 5)
             ->leftJoin('events AS e', 's.id', '=', 'e.schedule_id')
             ->leftJoin('liturgicals AS l', 'l.id', '=', 'e.liturgical_id')
             ->join('users AS u', 'u.id', '=', 's.created_by')
@@ -100,9 +81,29 @@ class EventController extends Controller
                 'l.title AS liturgical_title',
                 'l.requirements AS liturgical_requirement',
                 'l.stipend AS liturgical_stipend'
-            ])
-            ->get();
+            ]);
 
+        if (Auth::user()->role != "secretary") {
+            // Filter by selected IDs if provided
+            if (!empty($selectedIds)) {
+                $events = $events->whereIn('s.assign_to', $selectedIds);
+            } else {
+                if (Auth::user()->role != "admin") {
+                    // Adjusted condition: checking for either `assign_to` being the authenticated user or `assign_to` being empty
+                    $events = $events->where(function ($query) {
+                        $query->where('s.assign_to', Auth::user()->id)
+                            ->orWhere('s.assign_to', ''); // Includes events where assign_to is empty
+                    });
+                }
+            }
+        }
+
+
+
+        // Fetch events
+        $events = $events->get();
+
+        // Map and return the events as JSON
         $renamedEvents = $events->map(function ($event) {
             return [
                 'id' => $event->event_id,
@@ -131,7 +132,4 @@ class EventController extends Controller
 
         return response()->json($renamedEvents);
     }
-
-
-
 }

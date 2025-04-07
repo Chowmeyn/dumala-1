@@ -15,6 +15,14 @@
     border-radius: 0px !important;
 }
 
+
+.active-filter{
+    border-bottom: 2px solid #2c3e50 !important;
+    background-color: white !important;
+    color: #2c3e50 !important;
+    border-radius: 0px !important;
+}
+
 .switch-container {
     position: relative;
     display: inline-block;
@@ -78,53 +86,6 @@
 #dt-search-0 {
     width: 500px;
 }
-
-.btn-group .btn {
-    border: none;
-    /* Remove all borders */
-    border-bottom: 2px solid #ccc;
-    /* Light gray bottom border */
-    border-radius: 0;
-    /* No rounded edges */
-    color: #aaa;
-    /* Gray text for inactive state */
-    background-color: transparent;
-    /* Transparent background */
-    padding: 10px 20px;
-    /* Adjust padding */
-    cursor: pointer;
-    /* Allow clicking */
-}
-
-/* Active button - Only text and border color changes */
-.btn-group .btn.active {
-    border-bottom: 3px solid #244625 !important;
-    /* Green bottom border */
-    color: #244625 !important;
-    /* Green text */
-    font-weight: bold;
-    /* Make it stand out */
-    background-color: transparent !important;
-    /* No full background */
-}
-
-/* Hover effect for non-active buttons */
-.btn-group .btn:not(.active):hover,
-.btn-group .btn:not(.active):focus {
-    border-bottom: 2px solid #244625 !important;
-    color: #244625 !important;
-    background-color: #f5f5f5;
-    /* Light gray hover background */
-}
-
-/* Ensure active button does not change on hover */
-.btn-group .btn.active:hover,
-.btn-group .btn.active:focus {
-    color: #244625 !important;
-    /* Keep text green */
-    background-color: transparent !important;
-    /* No background change */
-}
 </style>
 @endpush
 
@@ -151,7 +112,6 @@
         <li class="breadcrumb-item"><a href="javascript:;">Home</a></li>
         <li class="breadcrumb-item active">Accounts</li>
     </ol>
-
     <!-- END breadcrumb -->
     <!-- BEGIN page-header -->
     <h1 class="page-header">Accounts <small></small></h1>
@@ -161,102 +121,6 @@
 
     <!-- BEGIN panel -->
     <div class="panel panel-inverse" style="padding-left: 0px !important; padding-right: 0px !important;">
-<<<<<<< HEAD
-        <!-- BEGIN panel-heading -->
-        <div class="panel-heading" style="background: #fdfeff !important; padding-bottom: 0px !important;">
-<<<<<<< Updated upstream
-            <h4 class="panel-title pt-2" style="width: auto !important;">
-                <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm"
-                    style="display: inline !important;">
-                    Add Account
-                </a>
-            </h4>
-=======
-            <div class="row">
-                <div class="col-md-12 ">
-                    <div class="btn-group w-100">
-                        <a class="btn btn-outline-inverse all active ">All</a>
-                        <a class="btn btn-outline-inverse all active ">All</a>
-                        <a class="btn btn-outline-inverse priest ">Priest</a>
-                        <a class="btn btn-outline-inverse secretary">Secretary</a>
-                        <a class="btn btn-outline-inverse parishioners">Parishioners</a>
-                        <a class="btn btn-outline-inverse non_parishioners">Non-parishioners</a>
-                    </div>
-                </div>
-                <div class="col-md-12 mt-2">
-                    <h4 class="panel-title pt-2" style="width: auto !important;">
-                        <a href="#modal-dialog-add" data-bs-toggle="modal" class="btn btn-primary btn-sm"
-                            style="display: inline !important;">
-                            Add Account
-                        </a>
-                    </h4>
-                </div>
-            </div>
-
->>>>>>> Stashed changes
-
-        </div>
-        <!-- END panel-heading -->
-        <!-- BEGIN panel-body -->
-        <div class="panel-body" style="padding-bottom: 0px !important;">
-            <!-- Search Input -->
-            <div class="row">
-                <div class="col-md-12">
-
-                    <div class="input-group">
-                        <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role"
-                            oninput="getList(this.value)">
-                        <div class="input-group-text" style="background: #fdfeff !important;"><i
-                                class="fa fa-search"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <table id="accounts-table" width="100%" class="table">
-                <thead>
-                    <tr>
-                        <th width="1%"></th>
-                        <th width="1%" data-orderable="false"></th>
-                        <th class="text-nowrap">Name</th>
-                        <th class="text-nowrap">Role</th>
-                        <th  width="1%" class="text-nowrap">Status</th>
-                        <th class="text-nowrap" style="text-align: right; padding-right: 50px">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- User data rows will be dynamically inserted here -->
-                </tbody>
-            </table>
-
-        <!-- Pagination -->
-        <div class="row mt-2 justify-content-between">
-            <div class="col-md-auto me-auto">
-                <div class="dt-info" aria-live="polite" id="accounts-table_info" role="status">
-                    Showing 0 to 0 of 0 entries
-                </div>
-<<<<<<< Updated upstream
-            </div>
-            <div class="col-md-auto ms-auto">
-                <div class="dt-paging paging_full_numbers">
-                    <ul class="pagination" id="pagination-container">
-                        <!-- Pagination buttons will be dynamically inserted here -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- END panel-body -->
-</div>
-        <!-- END panel -->
-=======
-                <div class="col-md-auto ms-auto">
-                    <div class="dt-paging paging_full_numbers">
-                        <ul class="pagination" id="pagination-container">
-                            <!-- Pagination buttons will be dynamically inserted here -->
-                        </ul>
-                    </div>
-=======
     <!-- BEGIN panel-heading -->
     <div class="panel-heading d-flex justify-content-between align-items-center" style="background: #fdfeff !important; padding-bottom: 0px !important;">
         <h4 class="panel-title pt-2" style="width: auto !important;">
@@ -307,7 +171,6 @@
                 <div class="input-group">
                     <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role" oninput="getList(this.value)">
                     <div class="input-group-text" style="background: #fdfeff !important;"><i class="fa fa-search"></i></div>
->>>>>>> 67d91adb (added accounts filter and login validation)
                 </div>
             </div>
         </div>
@@ -347,17 +210,10 @@
     </div>
     <!-- END panel-body -->
 </div>
-<<<<<<< HEAD
-        <!-- BEGIN hljs-wrapper -->
-
-        <!-- END hljs-wrapper -->
-    </div>
-    <!-- END panel -->
->>>>>>> Stashed changes
-=======
         <!-- END panel -->
->>>>>>> 93e73b8e (filter styles and remove admin account from display)
     </div>
+    
+    <!-- Add Account Modal -->
     
     <!-- Add Account Modal -->
     <div class="modal fade" id="modal-dialog-add">
@@ -409,7 +265,7 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <select class="form-control fs-15px" id="role" name="role"
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important;">
-                                                <!-- <option value="admin">Admin</option> -->
+                                                <option value="admin">Admin</option>
                                                 <option value="parish_priest">Parish priest</option>
                                                 <option value="secretary">Secretary</option>
                                                 <option value="priest">Priest</option>
@@ -457,6 +313,7 @@
         </div>
     </div>
 
+<!-- Edit Account Modal -->
 <!-- Edit Account Modal -->
     <div class="modal fade" id="modal-dialog-edit">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -508,7 +365,7 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <select class="form-control fs-15px" id="editRole" name="role"
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important;">
-                                                <!-- <option value="admin">Admin</option> -->
+                                                <option value="admin">Admin</option>
                                                 <option value="parish_priest">Parish priest</option>
                                                 <option value="secretary">Secretary</option>
                                                 <option value="priest">Priest</option>
@@ -573,24 +430,6 @@ function updateSwitchText(id) {
     }
 }
 
-$(".btn-group .btn").on("click", function() {
-    $(".btn-group .btn").removeClass("active"); // Remove active class from all buttons
-    $(this).addClass("active"); // Add active class to the clicked button
-
-    // Get and log the class of the clicked button (excluding 'btn' and 'active')
-    let selectedClass = $(this).attr("class").split(" ").filter(cls =>
-        cls !== "btn" && cls !== "btn-outline-inverse" && cls !== "active"
-    ).join(" ");
-    console.log(selectedClass);
-    if (selectedClass == 'all') {
-        getList(null)
-    }else{
-        getList(selectedClass);
-    }
-    
-
-});
-
 
 $('#accounts').addClass('active');
 $('#accounts-table').DataTable({
@@ -613,11 +452,10 @@ $('#editProfileImageInput').on('change', function(e) {
     reader.readAsDataURL(e.target.files[0]);
 });
 
-$(document).ready(function() { 
+$(document).ready(function() {
     $('#previewImage').on('click', function() {
         $('#profile_image').click();
     });
-
     $('#profile_image').on('change', function(e) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -626,23 +464,8 @@ $(document).ready(function() {
         reader.readAsDataURL(e.target.files[0]);
     });
 
-    // Contact number validation
-    $('#contact').on('input', function() {
-        let value = $(this).val().replace(/\D/g, ''); // Remove non-numeric characters
-        if (value.length > 11) {
-            value = value.substring(0, 11); // Limit to 11 digits
-        }
-        $(this).val(value);
-    });
-
     $('#addAccountForm').on('submit', function(e) {
         e.preventDefault();
-
-        let contactNumber = $('#contact').val();
-        if (contactNumber.length !== 11) {
-            alert('Contact number must be exactly 11 digits.');
-            return;
-        }
 
         let formData = new FormData(this);
 
@@ -662,6 +485,7 @@ $(document).ready(function() {
 
                 $('#modal-dialog-add').modal('hide');
                 $('#addAccountForm')[0].reset();
+
             },
             error: function(xhr) {
                 alert('Error: ' + xhr.responseJSON.message);
@@ -720,7 +544,6 @@ $('#editAccountForm').on('submit', function(event) {
                 });
 
                 getList(null);
-                $('#modal-dialog-edit').modal('hide');
             } else {
                 message({
                     title: 'Error!',
@@ -729,33 +552,12 @@ $('#editAccountForm').on('submit', function(event) {
                 });
             }
         },
-        error: function(xhr) {
-            if (xhr.status === 422) {
-                // Laravel validation error handling
-                const errors = xhr.responseJSON.errors;
-                let errorMessages = '';
-
-                $.each(errors, function(key, value) {
-                    errorMessages += value[0] + '<br>';
-                    $(`#edit${key.charAt(0).toUpperCase() + key.slice(1)}`).addClass('is-invalid');
-                });
-
-                message({
-                    title: 'Validation Error!',
-                    message: errorMessages,
-                    icon: 'error'
-                });
-            } else {
-                console.error('Error updating user:', xhr.responseText);
-            }
+        error: function(xhr, status, error) {
+            console.error('Error updating user:', error);
         }
     });
 });
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
->>>>>>> 93e73b8e (filter styles and remove admin account from display)
 $(document).ready(function() {
     // Initialize the active tab
     $('#all-tab').addClass('active-filter');
@@ -776,11 +578,6 @@ $(document).ready(function() {
     getList(null);
 });
 
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> 93e73b8e (filter styles and remove admin account from display)
 function filterByRole(role) {
     const search = $('#search-input').val();
     getList(search, '/user-list', role);
@@ -793,10 +590,11 @@ function getList(search, url = '/user-list', role = 'all') {
         data: {
             search: search,
             role: role
+            search: search,
+            role: role
         },
         dataType: 'json',
         success: function(response) {
-<<<<<<< Updated upstream
             renderTable(response);
         },
         error: function(xhr, status, error) {
@@ -804,10 +602,6 @@ function getList(search, url = '/user-list', role = 'all') {
         }
     });
 }
-=======
-<<<<<<< HEAD
-            let tableContent = '';
->>>>>>> Stashed changes
 
 function renderTable(response) {
     let tableContent = '';
@@ -823,82 +617,6 @@ function renderTable(response) {
             const profileImage = user.profile_image ?
                 `<img src="${user.profile_image}" class="rounded h-30px my-n1 mx-n1" />` :
                 `<img src="/assets/img/user/user-profile-icon.jpg" class="rounded h-30px my-n1 mx-n1" />`;
-
-                    // Determine the status checkbox and label
-                    const isChecked = user.user_status === 'active';
-                    const statusSwitch = `
-                        <div class="switch-container">
-                            <input type="checkbox" id="customSwitch${user.id}" onchange="updateSwitchText(${user.id})"
-                                   class="switch-input" ${isChecked ? 'checked' : ''} />
-                            <label for="customSwitch${user.id}" class="switch-label">
-                                <span title="${isChecked ? 'Active' : 'Deactivated'}" class="switch-text switch-text${user.id}">${isChecked ? 'Active' : 'Deactivated'}</span>
-                            </label>
-                        </div>
-                    `;
-
-                    // Create the table row
-                    tableContent += `
-                        <tr>
-                            <td width="1%" class="fw-bold">${index + 1}</td>
-                            <td width="1%" class="with-img">${profileImage}</td>
-                            <td>${user.prefix ? user.prefix+'.': ''} ${user.firstname} ${user.lastname}</td>
-                            <td>${user.role}</td>
-                            <td>${statusSwitch}</td>
-                            <td style="text-align: right; padding-right: 50px">
-                                <a href="#" data-bs-toggle="dropdown" class="text-body text-opacity-50">
-                                    <i class="fa fa-ellipsis-h fs-30px"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="#" class="dropdown-item" onclick="openEditModal(${user.id})">Edit</a>
-                                    <a href="#" onclick="delete_user(${user.id})" class="dropdown-item">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-
-    $('#accounts-table tbody').html(tableContent);
-
-    if (response.meta) {
-        const paginationInfo =
-            `Showing ${response.meta.from} to ${response.meta.to} of ${response.meta.total} entries`;
-        $('#accounts-table_info').text(paginationInfo);
-
-        if (response.meta.links) {
-            let paginationLinks = '';
-            response.meta.links.forEach(link => {
-                if (link.url) {
-                    const label = link.label.replace(/&laquo;|&raquo;/g, '').trim();
-                    if (!isNaN(label)) {
-                        paginationLinks += `<li class="page-item ${link.active ? 'active' : ''}">
-                                                <a href="#" class="page-link" data-url="${link.url}" onclick="handlePaginationClick(event)">${label}</a>
-                                            </li>`;
-                    }
-                }
-            });
-
-<<<<<<< Updated upstream
-            $('#pagination-container').html(paginationLinks);
-=======
-                $('#pagination-container').html(paginationLinks);
-            }
-=======
-            renderTable(response);
->>>>>>> 67d91adb (added accounts filter and login validation)
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching data:', error);
->>>>>>> Stashed changes
-        }
-    }
-}
-
-<<<<<<< Updated upstream
-=======
-function renderTable(response) {
-    let tableContent = '';
-
     if (response.data.length === 0) {
         tableContent = `
             <tr>
@@ -944,12 +662,23 @@ function renderTable(response) {
     }
 
     $('#accounts-table tbody').html(tableContent);
+    $('#accounts-table tbody').html(tableContent);
 
     if (response.meta) {
         const paginationInfo =
             `Showing ${response.meta.from} to ${response.meta.to} of ${response.meta.total} entries`;
         $('#accounts-table_info').text(paginationInfo);
+    if (response.meta) {
+        const paginationInfo =
+            `Showing ${response.meta.from} to ${response.meta.to} of ${response.meta.total} entries`;
+        $('#accounts-table_info').text(paginationInfo);
 
+        if (response.meta.links) {
+            let paginationLinks = '';
+            response.meta.links.forEach(link => {
+                if (link.url) {
+                    const label = link.label.replace(/&laquo;|&raquo;/g, '').trim();
+                    if (!isNaN(label)) {
         if (response.meta.links) {
             let paginationLinks = '';
             response.meta.links.forEach(link => {
@@ -968,7 +697,6 @@ function renderTable(response) {
     }
 }
 
->>>>>>> Stashed changes
 function handlePaginationClick(event) {
     event.preventDefault();
     const url = $(event.target).data('url');
@@ -1030,6 +758,7 @@ function delete_user(id) {
                 message({
                     title: 'Success!',
                     message: 'Account deleted successfully!',
+                    message: 'Account deleted successfully!',
                     icon: 'success'
                 });
                 getList(null);
@@ -1043,9 +772,11 @@ function delete_user(id) {
         },
         error: function(xhr, status, error) {
             console.error('Error deleting user:', error);
+            console.error('Error deleting user:', error);
         }
     });
 }
+
 
 </script>
 @endpush

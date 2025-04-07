@@ -196,7 +196,7 @@ function populateEditorWithData(data) {
 function getList(search = '', year = '', month = '', page = 1) {
     currentPage = page; // Update current page
     $.ajax({
-        url: '/list-request',
+        url: '/list-request-complete',
         method: 'GET',
         dataType: 'json',
         data: {

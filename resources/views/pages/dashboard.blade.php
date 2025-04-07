@@ -231,10 +231,10 @@
                 <p><strong>Address:</strong> <span id="event-address"></span></p>
                 <p><strong>Additional Comment:</strong> <span id="event-comment"></span></p>
             </div>
-            <div class="modal-footer border-0 d-flex justify-content-between">
+            <!-- <div class="modal-footer border-0 d-flex justify-content-between">
                 <button type="button" class="btn btn-success px-4" id="update-btn">Update</button>
                 <button type="button" class="btn btn-danger px-4" id="complete-btn">Complete</button>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -544,12 +544,11 @@ var handleCalendarDemo = function() {
             method: 'GET',
             async: false,
             success: function(data) {
-                console.log("Sched :::", data);
-
+     
                 if (typeof data === 'string') {
                     try {
                         const parsedData = JSON.parse(data);
-                        ret = parsedData.map(event => {
+                        ret = parsedData.filter(event => event.title === "Mass Schedule").map(event => {
                             const date = new Date(event.start);
                             event.startFormatted = date.toLocaleString('en-US', {
                                 hour: 'numeric',
@@ -561,8 +560,9 @@ var handleCalendarDemo = function() {
                     } catch (error) {
                         console.error("JSON parsing error:", error);
                     }
-                } else {
-                    ret = data.map(event => {
+                } else { 
+                    // Mass Schedule
+                    ret = data.filter(event => event.title === "Mass Schedule").map(event => {
                         const date = new Date(event.start);
                         event.startFormatted = date.toLocaleString('en-US', {
                             hour: 'numeric',
@@ -938,7 +938,8 @@ $(document).on('click', '#save-schedule', function() {
                     }
                 });
             } else {
-                alert('An error occurred: ' + xhr.responseText);
+                console.log(xhr);
+                alert(xhr.responseJSON.message);
             }
         },
     });
@@ -980,7 +981,8 @@ $('#save-event-btn').on('click', function() {
             $('[data-bs-dismiss="modal"]').click();
         },
         error: function(xhr, status, error) {
-            alert('An error occurred: ' + error);
+            console.log(xhr);
+            alert(xhr.responseJSON.message);
         }
     });
 });

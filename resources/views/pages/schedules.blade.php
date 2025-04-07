@@ -22,62 +22,84 @@
     <!-- END breadcrumb -->
     <!-- BEGIN page-header -->
     <h1 class="page-header">Schedules <small>
-    @if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest' )
-    <a href="#modal-create-own-sched" data-bs-toggle="modal"
-                class="btn btn-primary btn-sm me-1 mb-1">Create own
-                schedule</a> <a href="#modal-create-mass-sched" class="btn btn-success btn-sm me-1 mb-1"
-                data-bs-toggle="modal">Create mass
+            @if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest' || Auth::user()->role ===
+            'priest' )
+            <a href="#modal-create-own-sched" data-bs-toggle="modal" class="btn btn-primary btn-sm me-1 mb-1">Create own
                 schedule</a>
-    @endif
-    
-   
-            </small></h1>
+            <!-- <a href="#modal-create-mass-sched" class="btn btn-success btn-sm me-1 mb-1"
+                data-bs-toggle="modal">Create mass
+                schedule</a> -->
+            @endif
+
+
+        </small></h1>
     <!-- END page-header -->
     <hr />
     <!-- BEGIN row -->
     <div class="row">
         <!-- BEGIN event-list -->
+        <?php
+                $role = Auth::user()->role;
+                $shouldHide = $role === 'admin' || $role === 'parish_priest' || $role === 'priest';
+            ?>
         <div class="d-none d-lg-block" style="width: 215px">
-            <div id="external-events" class="fc-event-list " style="display: none">
-                <h5 class="mb-3">List own schedules</h5>
-                <div class="fc-event" data-sched_id="1" data-color="#00acac">
-                    <div class="fc-event-text">Meeting with Client</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-success"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="2" data-color="#348fe2">
-                    <div class="fc-event-text">IOS App Development</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-blue"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="3" data-color="#f59c1a">
-                    <div class="fc-event-text">Group Discussion</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-warning"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="4" data-color="#ff5b57">
-                    <div class="fc-event-text">New System Briefing</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-danger"></i></div>
-                </div>
+            <div id="external-events" class="fc-event-list" <?= $shouldHide ? '' : 'style="display: none;"' ?>>
+                <h5 class="mb-3">Priests</h5>
+
+                <label class="d-flex align-items-center mb-2" data-sched_id="1" data-color="#00acac">
+                    <!-- <input type="checkbox" name="events[]" value="1" checked class="me-2">
+                    <i class="fas fa-circle fa-fw fs-9px text-success me-2"></i>
+                    <span class="fc-event-text">Unassigned</span> -->
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked="">
+                        <label class="form-check-label" for="flexCheckChecked">
+                            <b>Unassigned</b>
+                        </label>
+                    </div>
+
+                </label>
+
+                <label class="d-flex align-items-center mb-2" data-sched_id="2" data-color="#348fe2">
+
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input flexCheckChecked" type="checkbox" value="{{Auth::user()->id}}" id="flexCheckChecked_{{Auth::user()->id}}" checked
+                            onclick="getEvents('{{Auth::user()->id}}')">
+                        <label class="form-check-label" for="flexCheckChecked_{{Auth::user()->id}}">
+                            <b>Own Schedule</b>
+                        </label>
+                    </div>
+                </label>
+
+
+                @foreach(get_all_priest() as $priest)
+
+                @if($priest->name != Auth::user()->name)
+                <label class="d-flex align-items-center mb-2" data-sched_id="2" data-color="#348fe2">
+
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input flexCheckChecked" type="checkbox" value="{{$priest->id}}" id="flexCheckChecked_{{$priest->id}}" <?=(Auth::user()->role === 'admin') ? "checked" : "" ?> onclick="getEvents('{{$priest->id}}')">
+                        <label class="form-check-label" for="flexCheckChecked_{{$priest->id}}">
+                            <b>{{ $priest->prefix }} {{ $priest->firstname }} {{ $priest->lastname }}</b>
+                        </label>
+                    </div>
+                </label>
+                @endif
+
+
+                <!-- <option value="{{ $priest->id }}">{{ $priest->name }}</option> -->
+                @endforeach
+
+                <!-- <label class="d-flex align-items-center mb-2" data-sched_id="3" data-color="#f59c1a">
+                    <input type="checkbox" name="events[]" value="3" class="me-2">
+                    <i class="fas fa-circle fa-fw fs-9px text-warning me-2"></i>
+                    <span class="fc-event-text">Group Discussion</span>
+                </label> -->
+
+
+
                 <hr class="my-3" />
-                <h5 class="mb-3">List mass schedules</h5>
-                <div class="fc-event" data-sched_id="5" data-color="#b6c2c9">
-                    <div class="fc-event-text">Other Event 1</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-gray-500"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="6" data-color="#b6c2c9">
-                    <div class="fc-event-text">Other Event 2</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-gray-500"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="7" data-color="#b6c2c9">
-                    <div class="fc-event-text">Other Event 3</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-gray-500"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="8" data-color="#b6c2c9">
-                    <div class="fc-event-text">Other Event 4</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-gray-500"></i></div>
-                </div>
-                <div class="fc-event" data-sched_id="9" data-color="#b6c2c9">
-                    <div class="fc-event-text">Other Event 5</div>
-                    <div class="fc-event-icon"><i class="fas fa-circle fa-fw fs-9px text-gray-500"></i></div>
-                </div>
             </div>
         </div>
         <!-- END event-list -->
@@ -104,7 +126,7 @@
             <div class="modal-body">
                 <input type="hidden" id="sched_ids">
                 <input type="hidden" id="event-priest-id">
-                <p><strong>Status:</strong> <span id="event-status"></span></p>
+                <!-- <p><strong>Status:</strong> <span id="event-status"></span></p> -->
                 <p><strong>Date:</strong> <span id="event-date"></span></p>
                 <p><strong>Time:</strong> <span id="event-time"></span></p>
                 <p><strong>Purpose:</strong> <span id="event-purpose"></span></p>
@@ -209,13 +231,13 @@
 <div class="modal fade" id="modal-create-mass-sched">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <!-- <div class="modal-header">
                 <h5 class="modal-title">Mass schedule</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
-            </div>
+            </div> -->
             <div class="modal-body">
                 <input type="hidden" id="update_mass_sched">
-                <div class="mb-3">
+                <div class="mb-3 d-none">
                     <label class="form-label" for="exampleInputEmail1">Date</label>
                     <div class="input-group date" id="datepicker-mass" data-date-format="yyyy-m-d"
                         data-date-start-date="Date.default">
@@ -225,7 +247,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 d-none">
                     <div class="row">
                         <div class="col-6">
                             <label class="form-label">From</label>
@@ -282,68 +304,71 @@ $(document).ready(function() {
         }
     });
 });
-$(document).ready(function() {
-    $('#update-btn').on('click', function() {
-        // Fetch event details from #event-details-modal
-        let status = $('#event-status').text();
-        let date = $('#event-date').text();
-        let time = $('#event-time').text().split(' - '); // Assuming format: "08:00 AM - 10:00 AM"
-        let purpose = $('#event-purpose').text().trim();
-        let venue = $('#event-venue').text();
-        let address = $('#event-address').text();
-        let others = $('.others').val();
-        let priestId = $('#event-priest-id').val(); // Assuming there's an element with priest ID
+
+function UpdateBTN() {
+    console.log("5");
+
+    // Fetch event details from #event-details-modal
+    let status = $('#event-status').text();
+    let date = $('#event-date').text();
+    let time = $('#event-time').text().split(' - '); // Assuming format: "08:00 AM - 10:00 AM"
+    let purpose = $('#event-purpose').text().trim();
+    let venue = $('#event-venue').text();
+    let address = $('#event-address').text();
+    let others = $('.others').val();
+    let priestId = $('#event-priest-id').val(); // Assuming there's an element with priest ID
 
 
-        // Convert the date using JavaScript
-        let parsedDate = new Date(date);
+    // Convert the date using JavaScript
+    let parsedDate = new Date(date);
 
-        // Format it to YYYY-MM-DD
-        let formattedDate = parsedDate.getFullYear() + "-" +
-            String(parsedDate.getMonth() + 1).padStart(2, '0') + "-" +
-            String(parsedDate.getDate()).padStart(2, '0');
+    // Format it to YYYY-MM-DD
+    let formattedDate = parsedDate.getFullYear() + "-" +
+        String(parsedDate.getMonth() + 1).padStart(2, '0') + "-" +
+        String(parsedDate.getDate()).padStart(2, '0');
 
 
-        if (purpose === "Mass Schedule") {
-            // Populate Mass Schedule Modal
+    if (purpose === "Mass Schedule") {
+        // Populate Mass Schedule Modal
 
-            $('#update_mass_sched').val($('#sched_ids').val());
-            $('#datepicker-mass-input').val(formattedDate);
-            $('#timepicker-mass-from').val(time[0]); // Start time
-            $('#timepicker-mass-to').val(time[1]); // End time
-            $('#priest-select').val(priestId); // Select priest
-            // assign_to_id
-            // Hide event details modal & show Mass Schedule modal
-            $('#event-details-modal').modal('hide');
-            setTimeout(() => {
-                $('#modal-create-mass-sched').modal('show');
-            }, 500);
-        } else {
-            // Populate Own Schedule Modal
-            $('#update_sched').val($('#sched_ids').val());
+        $('#update_mass_sched').val($('#sched_ids').val());
+        $('#datepicker-mass-input').val(formattedDate);
+        $('#timepicker-mass-from').val(time[0]); // Start time
+        $('#timepicker-mass-to').val(time[1]); // End time
+        $('#priest-select').val(priestId); // Select priest
+        // assign_to_id
+        // Hide event details modal & show Mass Schedule modal
+        $('#event-details-modal').modal('hide');
+        setTimeout(() => {
+            $('#modal-create-mass-sched').modal('show');
+        }, 500);
+    } else {
+        // Populate Own Schedule Modal
+        $('#update_sched').val($('#sched_ids').val());
 
-            $('#datepicker-disabled-past input').val(formattedDate);
-            $('#timepicker-from').val(time[0]); // Start time
-            $('#timepicker-to').val(time[1]); // End time
-            $('#venue').val(venue);
-            $('#address').val(address);
-            $('.others').val(others || "").prop('disabled', !others);
+        $('#datepicker-disabled-past input').val(formattedDate);
+        $('#timepicker-from').val(time[0]); // Start time
+        $('#timepicker-to').val(time[1]); // End time
+        $('#venue').val(venue);
+        $('#address').val(address);
+        $('.others').val(others || "").prop('disabled', !others);
 
-            // Select the correct Purpose radio button
-            $('input[name="flexRadioDefault"]').each(function() {
-                if ($(this).data('val') === purpose) {
-                    $(this).prop('checked', true);
-                }
-            });
+        // Select the correct Purpose radio button
+        $('input[name="flexRadioDefault"]').each(function() {
+            if ($(this).data('val') === purpose) {
+                $(this).prop('checked', true);
+            }
+        });
 
-            // Hide event details modal & show Own Schedule modal
-            $('#event-details-modal').modal('hide');
-            setTimeout(() => {
-                $('#modal-create-own-sched').modal('show');
-            }, 500);
-        }
-    });
-});
+        // Hide event details modal & show Own Schedule modal
+        $('#event-details-modal').modal('hide');
+        setTimeout(() => {
+            $('#modal-create-own-sched').modal('show');
+        }, 500);
+    }
+}
+
+
 
 
 var handleCalendarDemo = function() {
@@ -362,15 +387,71 @@ var handleCalendarDemo = function() {
         editable: false, // Set to false to disable editing
         droppable: false, // Disable event dropping
         themeSystem: 'bootstrap',
-        events: getEvets(),
+        selectable: true,
+        events: getEvents(),
+        // dateClick: function(info) {
+        //     console.log("Clicked date:", info.dateStr);
+        //     alert("You clicked on: " + info.dateStr);
+        // },
+        select: function(info) {
+            let startDate = new Date(info.start);
+            let endDate = new Date(info.end);
+
+            // Format: YYYY-MM-DD
+            let formattedDate = startDate.getFullYear() + "-" +
+                String(startDate.getMonth() + 1).padStart(2, '0') + "-" +
+                String(startDate.getDate()).padStart(2, '0');
+
+            // Format: HH:MM AM/PM
+            let formattedStartTime = startDate.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            let formattedEndTime = endDate.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            let formattedRange = formattedDate + " " + formattedStartTime + " to " + formattedEndTime;
+
+            console.log("Selected datetime:", formattedRange);
+            // alert("You selected: " + formattedRange);
+
+            // Set values in modal input fields
+            $('#datepicker-mass-input').val(formattedDate); // YYYY-MM-DD
+            $('#timepicker-mass-from').val(formattedStartTime); // HH:MM AM/PM
+            $('#timepicker-mass-to').val(formattedEndTime); // HH:MM AM/PM
+
+            // Show modal
+            $('#modal-create-mass-sched').modal('show');
+        },
         eventClick: function(info) {
             console.log("info ::", info.event._def.extendedProps);
             if (info.event._def.extendedProps.status != 5) {
 
             }
+            const status = info.event._def.extendedProps.status;
+            let statusBadge = '';
+
+            if (status === 1) {
+                statusBadge = '<span class="badge bg-yellow text-black">Pending</span>';
+            } else if (status === 2) {
+                statusBadge = '<span class="badge bg-primary">Accepted</span>';
+            } else if (status === 3) {
+                statusBadge = '<span class="badge bg-danger">Declined</span>';
+            } else if (status === 4) {
+                statusBadge = '<span class="badge bg-info text-black">Complete</span>';
+            } else if (status === 5) {
+                statusBadge = '<span class="badge bg-secondary">Archived</span>';
+            } else {
+                statusBadge = '<span class="badge bg-success">Accepted by priest</span>';
+            }
 
             $('#sched_ids').val(info.event._def.extendedProps.schedule_id);
-            $('#event-status').text(info.event._def.extendedProps.status);
+            $('#event-status').html(statusBadge);
             $('#event-date').text(info.event._def.extendedProps.formated_date);
             $('#event-time').text(info.event._def.extendedProps.start_time + " - " + info.event._def
                 .extendedProps.end_time);
@@ -384,12 +465,14 @@ var handleCalendarDemo = function() {
 
             if (info.event._def.extendedProps.status === 4) {
                 $('.modal-footer-detail').html(
-                    '<button type="button" class="btn btn-success px-4" id="archive-btn" onclick="archiveSched('+info.event._def.extendedProps.schedule_id+')">Archive</button>'
-                    );
+                    '<button type="button" class="btn btn-success px-4" id="archive-btn" onclick="archiveSched(' +
+                    info.event._def.extendedProps.schedule_id + ')">Archive</button>'
+                );
             } else {
                 $('.modal-footer-detail').html(
-                    '<button type="button" class="btn btn-success px-4" id="update-btn">Update</button><button type="button" class="btn btn-danger px-4" id="complete-btn" onclick="completeSched('+info.event._def.extendedProps.schedule_id+')">Complete</button>'
-                    );
+                    '<button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button><button type="button" class="btn btn-danger px-4" id="complete-btn" onclick="completeSched(' +
+                    info.event._def.extendedProps.schedule_id + ')">Complete</button>'
+                );
             }
 
 
@@ -401,49 +484,14 @@ var handleCalendarDemo = function() {
 
     calendar.render();
 
-    function getEvets() {
-        let ret = {};
-        $.ajax({
-            url: '/get-events',
-            method: 'GET',
-            async: false,
-            success: function(data) {
-                console.log("Sched :::", data);
-
-                if (typeof data === 'string') {
-                    try {
-                        const parsedData = JSON.parse(data);
-                        ret = parsedData.map(event => {
-                            const date = new Date(event.start);
-                            event.startFormatted = date.toLocaleString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                            });
-                            return event;
-                        });
-                    } catch (error) {
-                        console.error("JSON parsing error:", error);
-                    }
-                } else {
-                    ret = data.map(event => {
-                        const date = new Date(event.start);
-                        event.startFormatted = date.toLocaleString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        });
-                        return event;
-                    });
-                }
-            },
-            error: function(xhr) {
-                console.error(xhr.responseText);
-            }
-        });
-        return ret;
+    function refreshEvents() {
+        console.log("Refreshing events...");
+        // Refetch events with updated data
+        calendar.refetchEvents(); // This will reload the events based on current state of selectedIds
     }
 
+    // Bind checkbox change to refresh the calendar
+   
     function saveEvent(eventData) {
         $.ajax({
             url: '/save-event',
@@ -462,6 +510,90 @@ var handleCalendarDemo = function() {
     }
 };
 
+var Calendar = function() {
+    "use strict";
+    return {
+        init: function() {
+            handleCalendarDemo();
+        }
+    };
+}();
+
+$(document).ready(function() {
+    Calendar.init();
+});
+let selectedIds = ['<?=(Auth::user()->role === 'admin') ? "" : Auth::user()->id ?>'];
+function getEvents(val='') {
+    let ret = {};
+
+    // Check the checkbox state and either add or remove the ID from the array
+    const checkbox = $('#flexCheckChecked_' + val);  // Get the specific checkbox by ID
+    const isChecked = checkbox.prop('checked');  // Check if it's checked
+
+    // If the checkbox is checked, add its value to the array, else remove it
+    if (isChecked) {
+        // If it's not already in the array, add it
+        if (!selectedIds.includes(val)) {
+            selectedIds.push(val);
+        }
+    } else {
+        // Remove it from the array if it's unchecked
+        selectedIds = selectedIds.filter(id => id !== val);
+    }
+
+    // Log the selectedIds array to check if it updates correctly
+    console.log('Selected IDs:', selectedIds);
+
+
+    $.ajax({
+        url: '/get-events',
+        method: 'GET',
+        data: {
+            ARRAY: selectedIds
+        },
+        async: false,
+        success: function(data) {
+            console.log("Sched :::", data);
+
+            if (typeof data === 'string') {
+                try {
+                    const parsedData = JSON.parse(data);
+                    ret = parsedData.map(event => {
+                        const date = new Date(event.start);
+                        event.startFormatted = date.toLocaleString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        return event;
+                    });
+                } catch (error) {
+                    console.error("JSON parsing error:", error);
+                }
+            } else {
+                ret = data.map(event => {
+                    const date = new Date(event.start);
+                    event.startFormatted = date.toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    return event;
+                });
+            }
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+        }
+    });
+    return ret;
+}
+
+$('.flexCheckChecked').change(function() {
+        console.log("Checkbox changed, refreshing events...");
+        Calendar.init();
+    });
+
 function completeSched(sched_id) {
     $('#event-details-modal').modal('hide');
     $.ajax({
@@ -475,26 +607,27 @@ function completeSched(sched_id) {
             console.log(response);
 
             message({
-                    title: 'Success!',
-                    message: response.message,
-                    icon: 'success'
-                });
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
+                title: 'Success!',
+                message: response.message,
+                icon: 'success'
+            });
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
 
-          
+
         },
         error: function(xhr) {
             message({
-                    title: 'Error!',
-                    message: xhr.responseJSON.error,
-                    icon: 'error'
-                });
-            
+                title: 'Error!',
+                message: xhr.responseJSON.error,
+                icon: 'error'
+            });
+
         }
     });
 }
+
 function archiveSched(sched_id) {
     $('#event-details-modal').modal('hide');
     $.ajax({
@@ -506,37 +639,25 @@ function archiveSched(sched_id) {
         },
         success: function(response) {
             message({
-                    title: 'Success!',
-                    message: response.message,
-                    icon: 'success'
-                });
+                title: 'Success!',
+                message: response.message,
+                icon: 'success'
+            });
 
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
         },
         error: function(xhr) {
             message({
-                    title: 'Error!',
-                    message: xhr.responseJSON.error,
-                    icon: 'error'
-                });
+                title: 'Error!',
+                message: xhr.responseJSON.error,
+                icon: 'error'
+            });
         }
     });
 }
 // completeSched archiveSched
-var Calendar = function() {
-    "use strict";
-    return {
-        init: function() {
-            handleCalendarDemo();
-        }
-    };
-}();
-
-$(document).ready(function() {
-    Calendar.init();
-});
 
 $("#datepicker-disabled-past").datepicker({
     todayHighlight: true
@@ -623,7 +744,7 @@ $(document).on('click', '#save-schedule', function() {
                     }
                 });
             } else {
-                alert('An error occurred: ' + xhr.responseText);
+                alert(xhr.responseJSON.message);
             }
         },
     });
@@ -638,36 +759,52 @@ $('#save-event-btn').on('click', function() {
     var toTime = $('#timepicker-mass-to').val();
     var priestId = $('#priest-select').val();
 
-    // Validate data
+    var fl = true
 
-    // Send data using AJAX
-    $.ajax({
-        url: '{{ route("schedules.store") }}',
-        method: 'POST',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            schedId: $('#update_mass_sched').val(),
-            liturgical_id: '1',
-            date: selectedDate,
-            time_from: fromTime,
-            time_to: toTime,
-            assign_to: priestId,
-            sched_type: 'mass_sched',
-        },
-        success: function(response) {
-            alert('Event saved successfully.');
-            // Optionally, you can close the modal or reset the form here
-            $('#datepicker').val('');
-            $('#timepicker-mass-from').val('');
-            $('#timepicker-mass-to').val('');
-            $('#priest-select').val('');
-            // Close modal
-            $('[data-bs-dismiss="modal"]').click();
-        },
-        error: function(xhr, status, error) {
-            alert('An error occurred: ' + error);
-        }
-    });
+    if (priestId == "") {
+        alert("Please select priest!")
+        fl = false
+    }
+
+    if (fl) {
+        // Validate data
+
+        // Send data using AJAX
+        $.ajax({
+            url: '{{ route("schedules.store") }}',
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                schedId: $('#update_mass_sched').val(),
+                liturgical_id: '1',
+                date: selectedDate,
+                time_from: fromTime,
+                time_to: toTime,
+                assign_to: priestId,
+                sched_type: 'mass_sched',
+            },
+            success: function(response) {
+                alert('Event saved successfully.');
+                // Optionally, you can close the modal or reset the form here
+                $('#datepicker').val('');
+                $('#timepicker-mass-from').val('');
+                $('#timepicker-mass-to').val('');
+                $('#priest-select').val('');
+                // Close modal
+                $('[data-bs-dismiss="modal"]').click();
+
+                $('#modal-create-mass-sched').modal('hide');
+                location.reload();
+
+
+            },
+            error: function(xhr, status, error) {
+                alert(xhr.responseJSON.message);
+            }
+        });
+    }
+
+
 });
 </script>
 @endpush

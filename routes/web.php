@@ -93,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/list-request', [App\Http\Controllers\RequestController::class, 'getListSched'])->name('list-request');
 
+    Route::get('/list-request-complete', [App\Http\Controllers\RequestController::class, 'getListComplete'])->name('list-request-complete');
+
     Route::get('/list-liturgical', [App\Http\Controllers\LiturgicalController::class, 'getListLiturgical'])->name('list-liturgical');
 
     Route::post('/completeSched', [App\Http\Controllers\ScheduleController::class, 'completeSched'])->name('completeSched');

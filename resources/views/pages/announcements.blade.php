@@ -29,8 +29,8 @@
             <h4 class="panel-title" style="width: auto !important;">
                 <a href="{{ route('public_announce') }}" class="btn btn-primary btn-sm"
                     style="display: inline !important;">Create announcement</a>
-                <a href="{{ route('post_regular_sched') }}" class="btn btn-success btn-sm"
-                    style="display: inline !important;">Post regular schedule</a>
+                <!-- <a href="{{ route('post_regular_sched') }}" class="btn btn-success btn-sm"
+                    style="display: inline !important;">Post regular schedule</a> -->
             </h4>
         </div>
         <!-- END panel-heading -->
@@ -73,10 +73,7 @@
             </ul>
             <table class="table table-hover">
                 <thead>
-                    <tr>
-                        <th style="width: 50%;">Title</th>
-                        <th style="width: 50%;">Date</th>
-                    </tr>
+                    
                 </thead>
                 <tbody>
 
@@ -104,6 +101,25 @@ $(document).ready(function() {
 
     function fetchAnnouncements(page = 1) {
 
+        $('thead').html(`
+        <tr>
+                        <th style="width: 50%;">Title</th>
+                        <th style="width: 50%;">Date</th>
+                        
+                    </tr>
+        `);
+
+        if ($('#announcement_status').val() == "is_archive") {
+            $('thead').html(`
+        <tr>
+                        <th style="width: 50%;">Title</th>
+                        <th style="width: 50%;">Date</th>
+                        <th style="width: 50%;">Date</th>
+                        
+                    </tr>
+        `);
+        }
+
         $('#loading').show(); // Show loading indicator
         const announcementType = $('#announcement_type').val(); // Get selected announcement type
         $.ajax({
@@ -122,7 +138,39 @@ $(document).ready(function() {
                     </tr>
                 `;
                 } else {
-                    response.data.forEach(announcement => {
+
+                    if ($('#announcement_status').val() == "is_archive") {
+                        response.data.forEach(announcement => {
+                        tbody += `
+                        <tr data-bs-toggle="collapse" data-bs-target="#detailsRow${announcement.id}" aria-expanded="false" aria-controls="detailsRow${announcement.id}">
+                            <td style="padding-top: 20px;">${announcement.title}</td>
+                            <td style="padding-top: 20px;">${new Date(announcement.created_at).toLocaleDateString()}</td>
+                            <td style="padding-top: 20px;">${new Date(announcement.updated_at).toLocaleDateString()}</td>
+                        </tr>
+                        <tr id="detailsRow${announcement.id}" class="collapse fade">
+                            <td colspan="6">
+                                <div class="p-1 bg-light">
+                                    <div class="d-flex p-1">
+                                        <div class="flex-1">
+                                            <table class="table mb-2" style="border: none !important;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="border: none !important;">${announcement.content}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <p class="mb-0 d-flex justify-content-end">
+                                                ${getStatus(announcement)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    });
+                    }else{
+                        response.data.forEach(announcement => {
                         tbody += `
                         <tr data-bs-toggle="collapse" data-bs-target="#detailsRow${announcement.id}" aria-expanded="false" aria-controls="detailsRow${announcement.id}">
                             <td style="padding-top: 20px;">${announcement.title}</td>
@@ -150,6 +198,8 @@ $(document).ready(function() {
                         </tr>
                     `;
                     });
+                    }
+                    
                 }
 
                 $('tbody').html(tbody);
@@ -186,9 +236,10 @@ $(document).ready(function() {
 
         if (data.status == 'is_pending') {
             html =
-                `<a href="javascript:;" class="btn btn-sm btn-success me-5px is_posted_class" data-id="${data.id}" aria-label="Post">Post</a>
+                `@if(Auth::user()->role == 'secretary') <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_archive_class" data-id="${data.id}" aria-label="Decline">Decline</a>
+                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit">Edit</a>  @else <a href="javascript:;" class="btn btn-sm btn-success me-5px is_posted_class" data-id="${data.id}" aria-label="Post">Post</a>
                                                 <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_archive_class" data-id="${data.id}" aria-label="Decline">Decline</a>
-                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit">Edit</a>`;
+                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit">Edit</a> @endif `;
 
         } else if (data.status == 'is_posted') {
 

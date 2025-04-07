@@ -16,11 +16,11 @@
     <!-- BEGIN breadcrumb -->
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:;">Home</a></li>
-        <li class="breadcrumb-item active">Priest Completed Services</li>
+        <li class="breadcrumb-item active">Total Liturgical Services Requested </li>
     </ol>
     <!-- END breadcrumb -->
     <!-- BEGIN page-header -->
-    <h1 class="page-header">Priest Completed Services <small></small></h1>
+    <h1 class="page-header">Total Liturgical Services Requested  <small></small></h1>
 
     <div class="panel panel-inverse">
 
@@ -30,17 +30,18 @@
             <div class="row">
                 <div class="col-md-2">
                     <select id="get-priest" class="form-select" onchange="getPriestId(this)">
-                        @foreach(get_all_priest() as $priest)
-                        <option value="{{ $priest->id }}">{{ $priest->prefix  }}. {{ $priest->firstname }} {{ $priest->lastname }}</option>
+                        @foreach(get_all_liturgical() as $priest)
+                        <option value=" {{$priest->title}}"> {{$priest->title}}</option>
                         @endforeach
+
 
                     </select>
                 </div>
                 <div class="col-md-12 mt-3">
                     <div class="btn-group w-100">
-                        <a href="/report-annual" class="btn btn-outline-success active">Annually</a>
-                        <a href="/report-month" class="btn btn-outline-success">Monthly</a>
-                        <a href="/report-week" class="btn btn-outline-success">Weekly</a>
+                        <a href="/liturgical-annual" class="btn btn-outline-success active">Annually</a>
+                        <a href="/liturgical-month" class="btn btn-outline-success">Monthly</a>
+                        <a href="/liturgical-week" class="btn btn-outline-success">Weekly</a>
                     </div>
                 </div>
 
