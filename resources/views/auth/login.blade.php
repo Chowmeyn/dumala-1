@@ -7,23 +7,23 @@
     <div class="login-cover">
         <div class="login-cover-img" style="background-image: url({{ asset('assets/img/wallpaper.jpg') }})"
             data-id="login-cover-image"></div>
-        <div class="login-cover-bg"></div>
+        <div class="login-cover-bg" style="background-color: #244625; opacity: 0.9;" ></div>
     </div>
     <!-- END login-cover -->
 
     <!-- BEGIN login-container -->
     <div class="login-container">
         <!-- BEGIN login-header -->
+        <!-- <div class="login-header d-flex justify-content-center">
+        <div class="login-cover">
+        <div class="login-cover-img" style="background-color: #244625 !important"
+            data-id="login-cover-image"></div>
+        <div class="login-cover-bg"></div>
+    </div>
+    <div class="login-container">
+        BEGIN login-header -->
         <div class="login-header d-flex justify-content-center">
-            <!-- <div class="brand">
-                <div class="d-flex align-items-center">
-                    <i class="fab fa-facebook-square fa-lg me-3"></i> <b>Color</b> Admin
-                </div>
-                <small>Bootstrap 5 Responsive Admin Template</small>
-            </div>
-            <div class="icon">
-                <i class="fa fa-lock"></i>
-            </div> -->
+        <img class="card-img-top w-150px " src="{{ asset('assets/img/cathedral_logo.png') }}" alt="">
             <img class="card-img-top w-200px " src="{{ asset('assets/img/logos-dumala-trans.png') }}" alt="">
         </div>
         <!-- END login-header -->

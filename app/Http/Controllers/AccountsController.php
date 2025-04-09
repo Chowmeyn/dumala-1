@@ -20,30 +20,23 @@ class AccountsController extends Controller
     public function users_list(Request $request)
     {
         $search = $request->input('search');
-        $role = $request->input('role');
-        $role = $request->input('role');
+
         $perPage = $request->input('perPage', 10); // Default to 10 items per page
+        $page = $request->input('page', 1); // Default to page 1
 
-        $query = User::query();
-
-        // Exclude admin accounts
-        $query->where('role', '!=', 'admin');
+        $query = User::where('role', '!=', 'admin');
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('firstname', 'like', '%' . $search . '%')
-                ->orWhere('lastname', 'like', '%' . $search . '%')
-                ->orWhere('role', 'like', '%' . $search . '%');
+                    ->orWhere('lastname', 'like', '%' . $search . '%')
+                    ->orWhere('role', '=', $search);
             });
         }
 
-        if ($role && $role !== 'all') {
-            $query->where('role', $role);
-        }
-
+        $query->orderBy('firstname', 'asc'); // Sort alphabetically by firstname
 
         $users = $query->paginate($perPage);
-
 
         return UserResource::collection($users);
     }

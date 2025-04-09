@@ -1,20 +1,8 @@
 <div id="header" class="app-header" data-bs-theme="dark">
     <!-- BEGIN navbar-header -->
     <div class="navbar-header">
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        <a href="/dashboard" class="navbar-brand">
-=======
         <a href="/" class="navbar-brand">
             <!-- Add the image logo here -->
->>>>>>> upstream/main
-=======
-        <a href="/" class="navbar-brand">
-            <!-- Add the image logo here -->
-=======
-        <a href="/dashboard" class="navbar-brand">
->>>>>>> 67d91adb (added accounts filter and login validation)
->>>>>>> Stashed changes
             <img src="{{ asset('assets/img/logos-dumala-trans.png') }}" alt="Logo"
                 style="height: 100px; width: auto;" />
         </a>

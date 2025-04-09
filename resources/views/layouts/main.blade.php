@@ -340,7 +340,7 @@
                             </div>
                             <div class="col-8 pt-3">
                                 <div class="row">
-                                    <div class="col-3">
+                                    <!-- <div class="col-3">
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editPrefixProfile"
                                                 name="prefix" placeholder="Prefix"
@@ -348,8 +348,8 @@
                                             <label for="editPrefixProfile"
                                                 class="d-flex align-items-center fs-13px">Prefix</label>
                                         </div>
-                                    </div>
-                                    <div class="col-9">
+                                    </div> -->
+                                    <div class="col-6">
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editFirstnameProfile"
                                                 name="firstname" placeholder="First Name"
@@ -359,7 +359,7 @@
                                                 Name</label>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-6">
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editLastnameProfile"
                                                 name="lastname" placeholder="Last Name"

@@ -22,15 +22,16 @@
     <!-- END breadcrumb -->
     <!-- BEGIN page-header -->
     <h1 class="page-header">Schedules <small>
-            @if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest' || Auth::user()->role ===
-            'priest' )
-            <a href="#modal-create-own-sched" data-bs-toggle="modal" class="btn btn-primary btn-sm me-1 mb-1">Create own
+            @if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest')
+            <a id="createOwnSchedButton" class="btn btn-primary btn-sm me-1 mb-1" onclick="setCreateOwnSched()">Create own
                 schedule</a>
-            <!-- <a href="#modal-create-mass-sched" class="btn btn-success btn-sm me-1 mb-1"
-                data-bs-toggle="modal">Create mass
-                schedule</a> -->
+            <a id="createMassSchedButton" class="btn btn-primary btn-sm me-1 mb-1" onclick="setCreateMassSched()">Create mass schedule</a>
             @endif
 
+            @if(Auth::user()->role === 'priest' )
+            <a id="createOwnSchedButton" class="btn btn-primary btn-sm me-1 mb-1" onclick="setCreateOwnSched()">Create own
+                schedule</a>
+            @endif
 
         </small></h1>
     <!-- END page-header -->
@@ -126,7 +127,7 @@
             <div class="modal-body">
                 <input type="hidden" id="sched_ids">
                 <input type="hidden" id="event-priest-id">
-                <!-- <p><strong>Status:</strong> <span id="event-status"></span></p> -->
+                <p><strong>Status:</strong> <span id="event-status"></span></p>
                 <p><strong>Date:</strong> <span id="event-date"></span></p>
                 <p><strong>Time:</strong> <span id="event-time"></span></p>
                 <p><strong>Purpose:</strong> <span id="event-purpose"></span></p>
@@ -160,7 +161,7 @@
                             <label class="form-label" for="exampleInputEmail1">Date</label>
                             <div class="input-group date" id="datepicker-disabled-past" data-date-format="yyyy-m-d"
                                 data-date-start-date="Date.default">
-                                <input type="text" class="form-control form-control-sm" placeholder="Select Date" />
+                                <input type="text" class="form-control form-control-sm" id="datepicker-own-input" placeholder="Select Date" />
                                 <span class="input-group-text input-group-addon"><i class="fa fa-calendar"></i></span>
                             </div>
                         </div>
@@ -305,6 +306,33 @@ $(document).ready(function() {
     });
 });
 
+let createOwnSched = false;
+let createMassSched = false;
+const ownSchedButton = document.getElementById('createOwnSchedButton');
+    const massSchedButton = document.getElementById('createMassSchedButton');
+
+function setCreateOwnSched() {
+    createOwnSched = true;
+    createMassSched = false;
+    console.log('createOwnSched set to:', createOwnSched);
+    console.log('createMassSched set to:', createMassSched);
+
+    
+
+    $('#createOwnSchedButton').button('toggle');
+    $('#createMassSchedButton').removeClass('active');
+}
+
+function setCreateMassSched() {
+    createMassSched = true;
+    createOwnSched = false;
+    console.log('createOwnSched set to:', createOwnSched);
+    console.log('createMassSched set to:', createMassSched);
+
+    $('#createMassSchedButton').button('toggle');
+    $('#createOwnSchedButton').removeClass('active');
+}
+
 function UpdateBTN() {
     console.log("5");
 
@@ -396,6 +424,12 @@ var handleCalendarDemo = function() {
         select: function(info) {
             let startDate = new Date(info.start);
             let endDate = new Date(info.end);
+            let currentDate = new Date();
+
+            // Remove time from currentDate for comparison
+            currentDate.setHours(0, 0, 0, 0);
+
+            
 
             // Format: YYYY-MM-DD
             let formattedDate = startDate.getFullYear() + "-" +
@@ -417,16 +451,40 @@ var handleCalendarDemo = function() {
 
             let formattedRange = formattedDate + " " + formattedStartTime + " to " + formattedEndTime;
 
-            console.log("Selected datetime:", formattedRange);
-            // alert("You selected: " + formattedRange);
+            if (createOwnSched) {
+                // Check if the selected date is in the past
+                if (startDate < currentDate) {
+                    alert("You cannot select a past date.");
+                    return; // Stop further execution
+                }else{
+                    console.log("Selected datetime:", formattedRange);
 
-            // Set values in modal input fields
-            $('#datepicker-mass-input').val(formattedDate); // YYYY-MM-DD
-            $('#timepicker-mass-from').val(formattedStartTime); // HH:MM AM/PM
-            $('#timepicker-mass-to').val(formattedEndTime); // HH:MM AM/PM
+                    // Set values in modal input fields
+                    $('#datepicker-own-input').val(formattedDate); // YYYY-MM-DD
 
-            // Show modal
-            $('#modal-create-mass-sched').modal('show');
+                    // Show modal
+                    $('#modal-create-own-sched').modal('show');
+                    // createOwnSched = false;
+                }
+            } else if (createMassSched) {
+                if (startDate < currentDate) {
+                    alert("You cannot select a past date.");
+                    return; // Stop further execution
+                }else{
+                    console.log("Selected datetime:", formattedRange);
+
+                    // Set values in modal input fields
+                    $('#datepicker-mass-input').val(formattedDate); // YYYY-MM-DD
+                    $('#timepicker-mass-from').val(formattedStartTime); // HH:MM AM/PM
+                    $('#timepicker-mass-to').val(formattedEndTime); // HH:MM AM/PM
+
+                    // Show modal
+                    $('#modal-create-mass-sched').modal('show');
+                        // createOwnSched = false;
+                }
+            }
+            
+            
         },
         eventClick: function(info) {
             console.log("info ::", info.event._def.extendedProps);

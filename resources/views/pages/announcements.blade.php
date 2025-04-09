@@ -104,17 +104,26 @@ $(document).ready(function() {
         $('thead').html(`
         <tr>
                         <th style="width: 50%;">Title</th>
-                        <th style="width: 50%;">Date</th>
+                        <th style="width: 33.33%;">Date Created</th>
+                    </tr>
+        `);
+        
+        if ($('#announcement_status').val() == "is_posted") {
+        $('thead').html(`
+        <tr>
+                        <th style="width: 50%;">Title</th>
+                        <th style="width: 33.33%;">Date Created</th>
+                        <th style="width: 33.33%;">Date Posted</th>
                         
                     </tr>
         `);
-
+        }
         if ($('#announcement_status').val() == "is_archive") {
             $('thead').html(`
         <tr>
                         <th style="width: 50%;">Title</th>
-                        <th style="width: 50%;">Date</th>
-                        <th style="width: 50%;">Date</th>
+                        <th style="width: 33.33%;">Date Created</th>
+                        <th style="width: 33.33%;">Date Archived</th>
                         
                     </tr>
         `);
@@ -149,6 +158,36 @@ $(document).ready(function() {
                         </tr>
                         <tr id="detailsRow${announcement.id}" class="collapse fade">
                             <td colspan="6">
+                                <div class="p-1 bg-light">
+                                    <div class="d-flex p-1">
+                                        <div class="flex-1">
+                                            <table class="table mb-2" style="border: none !important;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="border: none !important;">${announcement.content}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <p class="mb-0 d-flex justify-content-end">
+                                                ${getStatus(announcement)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    });
+                    }else if ($('#announcement_status').val() == "is_posted") {
+                        response.data.forEach(announcement => {
+                        tbody += `
+                        <tr data-bs-toggle="collapse" data-bs-target="#detailsRow${announcement.id}" aria-expanded="false" aria-controls="detailsRow${announcement.id}">
+                            <td style="padding-top: 20px;">${announcement.title}</td>
+                            <td style="padding-top: 20px;">${new Date(announcement.created_at).toLocaleDateString()}</td>
+                            <td style="padding-top: 20px;">${new Date(announcement.updated_at).toLocaleDateString()}</td>
+                        </tr>
+                        <tr id="detailsRow${announcement.id}" class="collapse fade">
+                            <td colspan="5">
                                 <div class="p-1 bg-light">
                                     <div class="d-flex p-1">
                                         <div class="flex-1">
