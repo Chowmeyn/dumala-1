@@ -41,7 +41,7 @@
         <!-- BEGIN event-list -->
         <?php
                 $role = Auth::user()->role;
-                $shouldHide = $role === 'admin' || $role === 'parish_priest' || $role === 'priest';
+                $shouldHide = $role === 'admin' || $role === 'parish_priest' || $role === 'priest' || $role === 'secretary';
             ?>
         <div class="d-none d-lg-block" style="width: 215px">
             <div id="external-events" class="fc-event-list" <?= $shouldHide ? '' : 'style="display: none;"' ?>>
