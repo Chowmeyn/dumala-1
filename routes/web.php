@@ -92,6 +92,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/change-password', [UserController::class, 'changePassword']);
 
     Route::get('/list-request', [App\Http\Controllers\RequestController::class, 'getListSched'])->name('list-request');
+    
+    Route::get('/list-request/{id}', [App\Http\Controllers\RequestController::class, 'getRequestById'])->name('list-request.show');
+    Route::post('/request/{id}/delete', [App\Http\Controllers\RequestController::class, 'deleteRequest'])->name('request.delete');
 
     Route::get('/list-request-complete', [App\Http\Controllers\RequestController::class, 'getListComplete'])->name('list-request-complete');
 

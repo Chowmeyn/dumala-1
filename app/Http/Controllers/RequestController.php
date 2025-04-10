@@ -187,6 +187,17 @@ class RequestController extends Controller
     }
 
 
+    public function getRequestById($id)
+    {
+        $request = DB::table('schedule_events_view_v2')->where('schedule_id', $id)->first();
+
+        if (!$request) {
+            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+        }
+
+        return response()->json(['success' => true, 'data' => $request]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -222,6 +233,18 @@ class RequestController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    public function deleteRequest($id)
+    {
+        $request = DB::table('schedule_events_view_v2')->where('schedule_id', $id)->first();
+
+        if (!$request) {
+            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+        }
+
+        DB::table('schedule_events_view_v2')->where('schedule_id', $id)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Request deleted successfully.']);
+    }
     public function destroy(string $id)
     {
         //

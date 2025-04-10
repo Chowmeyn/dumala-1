@@ -138,7 +138,7 @@
                 <p><strong>Additional Comment:</strong> <span id="event-comment"></span></p>
             </div>
             <div class="modal-footer border-0 d-flex justify-content-center modal-footer-detail">
-                <button type="button" class="btn btn-success px-4" id="update-btn">Archive</button>
+                
             </div>
 
         </div>
@@ -181,7 +181,12 @@
                                 <span class="input-group-text input-group-addon"><i class="fa fa-clock"></i></span>
                             </div>
                         </div>
-
+                        <div class="mb-3">
+                            <label class="form-label">Request priest:</label>
+                            <select class="form-select priest-select" id="priest-select">
+                            <option value="{{ Auth::user()->id }}" selected>{{ Auth::user()->firstname }} {{ Auth::user()->lastname }}</option>
+                        </select>
+                        </div>
                     </div>
                     <div class="col-7">
                         <div class="mb-3">
@@ -223,7 +228,7 @@
             </div>
             <div class="modal-footer">
                 <a href="javascript:;" class="btn btn-white btn-xs" data-bs-dismiss="modal">Close</a>
-                <a href="javascript:;" class="btn btn-primary btn-xs" id="save-schedule">Action</a>
+                <a href="javascript:;" class="btn btn-primary btn-xs" id="save-schedule">Save</a>
             </div>
         </div>
     </div>
@@ -521,15 +526,17 @@ var handleCalendarDemo = function() {
             $('#event-comment').text(info.event._def.extendedProps.others || "None");
             $('#event-priest-id').val(info.event._def.extendedProps.assign_to_id);
 
-            if (info.event._def.extendedProps.status === 4) {
+            if (info.event._def.extendedProps.status === 1) {
                 $('.modal-footer-detail').html(
-                    '...'
+                    '<button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button>'
                 );
             } else {
+                
                 $('.modal-footer-detail').html(
-                    '<button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button><button type="button" class="btn btn-danger px-4" id="complete-btn" onclick="completeSched(' +
-                    info.event._def.extendedProps.schedule_id + ')">Complete</button>'
+                    '@if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest')<button type="button" class="btn btn-success px-4" id="complete-btn" onclick="completeSched(' +
+                    info.event._def.extendedProps.schedule_id + ')">Complete</button>@endif'
                 );
+                
             }
 
 
@@ -751,6 +758,7 @@ $(document).on('click', '#save-schedule', function() {
 
     const dateInput = $('#datepicker-disabled-past input');
     const dateValue = dateInput.val().trim();
+    let priestId = $('.priest-select').val();
 
     if (dateValue === '') {
         isValid = false;
@@ -769,7 +777,8 @@ $(document).on('click', '#save-schedule', function() {
         liturgical_id: $('input[name="flexRadioDefault"]:checked').attr('data-id'),
         others: $('.others').val(),
         sched_type: 'own_sched',
-        assign_to: '',
+        assign_to: priestId,
+        status: 6,
         _token: $('meta[name="csrf-token"]').attr('content'),
     };
 
@@ -811,20 +820,75 @@ $(document).on('click', '#save-schedule', function() {
 
 
 $('#save-event-btn').on('click', function() {
+    $('#timepicker-mass-from').val(function() {
+    var now = new Date();
+    var hours = now.getHours();
+    var minutes = now.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12; // Convert hour from 24-hour to 12-hour format
+    hours = hours ? hours : 12; // Hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero to minutes if needed
+    
+    var currentTime = hours + ':' + minutes + ' ' + ampm;
+    console.log("currentTime::", currentTime);
+    
+    return currentTime;
+    });
     var selectedDate = $('#datepicker-mass-input').val();
     var fromTime = $('#timepicker-mass-from').val();
     var toTime = $('#timepicker-mass-to').val();
+
     var priestId = $('#priest-select').val();
+
+    console.log('Oras ng Simula:', fromTime);
+    console.log('Oras ng Pagtatapos:', toTime);
 
     var fl = true
 
-    if (priestId == "") {
+    if (priestId === "") {
         alert("Please select priest!")
-        fl = false
+        fl = false;
     }
 
     if (fl) {
-        // Validate data
+        // Function to convert 12-hour time format (e.g., 1:09 AM) to 24-hour time
+        function convertTo24HourFormat(time) {
+            var timeArray = time.split(' '); // Split into time and AM/PM
+            var hourMin = timeArray[0].split(':'); // Split into hours and minutes
+            var hour = parseInt(hourMin[0]);
+            var minutes = hourMin[1];
+            var period = timeArray[1]; // 'AM' or 'PM'
+
+            if (hour === 12 && period === 'AM') {
+                hour = 0; // 12 AM is midnight (00:00)
+            } else if (period === 'PM' && hour !== 12) {
+                hour += 12; // Convert PM hours to 24-hour format
+            }
+
+            return new Date('1970-01-01T' + hour.toString().padStart(2, '0') + ':' + minutes + ':00Z');
+        }
+
+        // Convert fromTime and toTime to 24-hour format using the function
+        var from = convertTo24HourFormat(fromTime);
+        var to = convertTo24HourFormat(toTime);
+
+        // Compute the difference in minutes between the times
+        var duration = (to - from) / (1000 * 60); // Duration in minutes
+
+        if (duration >= 60) {
+            console.log("✅ Schedule successfully saved.");
+        } else {
+            // If less than 1 hour, set toTime to 1 hour from fromTime
+            to.setMinutes(from.getMinutes() + 60); // Set toTime 1 hour after fromTime
+            var newToTime = to.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); // Format to 12-hour time
+
+            $('#timepicker-mass-to').val(newToTime); // Set the new toTime value
+            console.log("❗ Schedule time too short:", newToTime);
+        }
+
+        // Send data using AJAX
+        // You can send data using AJAX if needed
 
         // Send data using AJAX
         $.ajax({

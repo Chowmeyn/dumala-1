@@ -190,7 +190,7 @@ class ScheduleController extends Controller
 
             $sched->assign_to_name = ($user->prefix == '') ? $user->firstname . ' ' . $user->lastname : $user->prefix . '.' . ' ' . $user->firstname . ' ' . $user->lastname;
             $sched->is_assign = '1';
-            $sched->status = $request->input('status',1);
+            $sched->status = $request->input('status',6);
 
             $sched->save();
 
@@ -273,7 +273,7 @@ class ScheduleController extends Controller
         $existingSchedule = Schedule::where('date', $date_now)
             ->where('time_from', $time_from_24)
             ->where('time_to', $time_to_24)
-            ->where('status', '2')
+            ->where('status', '!=', 3)
             ->first();
 
         if ($existingSchedule) {
@@ -291,6 +291,9 @@ class ScheduleController extends Controller
             ]);
         }
 
+        $user = User::find($request->input('assign_to'));
+        $user_name_f = $user ? (($user->prefix ? $user->prefix . '.' : '') . ' ' . $user->firstname . ' ' . $user->lastname) : 'N/A';
+
         $validated['date'] = $date_now;
         $validated['time_from'] = $time_from_24;
         $validated['time_to'] = $time_to_24;
@@ -300,13 +303,14 @@ class ScheduleController extends Controller
         $validated['assign_to'] = $request->input('assign_to');
         $validated['assign_by'] = Auth::user()->id;
         $validated['status'] = '1';
-        $validated['is_assign'] = ($sched_type === 'own_sched') ? '0' : '1';
-
+        $validated['is_assign'] = ($sched_type === 'own_sched')
+            ? (($request->input('assign_to') !== null) ? '1' : '0')
+            : '1';
+        $validated['assign_to_name'] = $user_name_f;
         if ($sched_type === 'mass_sched') {
-            $user = User::find($request->input('assign_to'));
-            $user_name_f = $user ? (($user->prefix ? $user->prefix . '.' : '') . ' ' . $user->firstname . ' ' . $user->lastname) : 'N/A';
+            
             $validated['purpose'] = 'Mass Schedule';
-            $validated['assign_to_name'] = $user_name_f;
+            
         }
 
         if ($isUpdate) {
@@ -356,7 +360,7 @@ class ScheduleController extends Controller
         send_notification($data);
 
         return response()->json([
-            'message' => $isUpdate ? 'Schedule updated successfully!' : 'Schedule created successfully!'
+            'message' => $isUpdate ? 'Schedule was updated successfully!': 'Schedule created successfully!'
         ], 200);
     }
 
