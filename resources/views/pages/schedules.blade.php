@@ -523,8 +523,7 @@ var handleCalendarDemo = function() {
 
             if (info.event._def.extendedProps.status === 4) {
                 $('.modal-footer-detail').html(
-                    '<button type="button" class="btn btn-success px-4" id="archive-btn" onclick="archiveSched(' +
-                    info.event._def.extendedProps.schedule_id + ')">Archive</button>'
+                    '...'
                 );
             } else {
                 $('.modal-footer-detail').html(

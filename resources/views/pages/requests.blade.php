@@ -195,7 +195,8 @@
                                 <option value="" selected>Choose a priest</option>
                                 @foreach(get_all_priest() as $priest)
 
-                                <option value="{{ $priest->id }}">{{ $priest->name }}</option>
+                                <option value="{{ $priest->id }}">{{ $priest->firstname }}
+                                {{ $priest->lastname }}</option>
                                 @endforeach
 
                             </select>
@@ -241,7 +242,7 @@
             </div>
             <div class="modal-footer">
                 <a href="javascript:;" class="btn btn-white btn-xs" data-bs-dismiss="modal">Close</a>
-                <a href="javascript:;" class="btn btn-primary btn-xs" id="save-schedule">Action</a>
+                <a href="javascript:;" class="btn btn-primary btn-xs" id="save-schedule">Submit</a>
             </div>
         </div>
     </div>
@@ -282,8 +283,9 @@ $(document).on('click', '#save-schedule', function() {
         assign_to: $('#priest-select').val(),
         // $('#priest-select').val()
         // priest-select
-        assign_to: '',
+        // assign_to: '',
         _token: $('meta[name="csrf-token"]').attr('content'),
+        
     };
 
     $.ajax({
