@@ -196,7 +196,7 @@ class RequestController extends Controller
 
     public function getRequestById($id)
     {
-        $request = DB::table('schedule_events_view_v2')->where('schedule_id', $id)->first();
+        $request = DB::table('schedules')->where('id', $id)->first();
 
         if (!$request) {
             return response()->json(['success' => false, 'message' => 'Request not found.'], 404);

@@ -86,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-events', [App\Http\Controllers\EventController::class, 'getEvents'])->name('calendar.getEvents');
 
     Route::post('/schedules-store', [App\Http\Controllers\ScheduleController::class, 'storeOrUpdate'])->name('schedules.store');
+    Route::post('/schedules/{id}/edit', [App\Http\Controllers\ScheduleController::class, 'edit'])->name('schedules.edit');
 
     Route::post('/assign_priest', [App\Http\Controllers\ScheduleController::class, 'assign_priest'])->name('assign_priest');
     Route::post('/acceptRequest', [App\Http\Controllers\ScheduleController::class, 'acceptRequest'])->name('acceptRequest');

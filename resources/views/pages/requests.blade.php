@@ -250,21 +250,23 @@
 
 <div class="modal fade" id="modal-edit-own-sched">
     <div class="modal-dialog">
-        <form id="edit-schedule-form" class="modal-content">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Schedule</h5>
+                <h5 class="modal-title">Edit schedule</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
             </div>
             <div class="modal-body">
+            <input type="hidden" id="update_sched">
                 <div class="row">
                     <div class="col-5">
                         <h6 class="mb-3 mt-3">Enter Date</h6>
                         <hr>
                         <div class="mb-3">
-                            <label class="form-label">Date</label>
-                            <div class="input-group date" id="datepicker-disabled-past" data-date-format="yyyy-m-d">
-                                <input type="text" name="date" class="form-control form-control-sm" placeholder="Select Date" />
-                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                            <label class="form-label" for="exampleInputEmail1">Date</label>
+                            <div class="input-group date" id="datepicker-disabled-past" data-date-format="yyyy-m-d"
+                                data-date-start-date="Date.default">
+                                <input type="text" class="form-control form-control-sm" placeholder="Select Date" />
+                                <span class="input-group-text input-group-addon"><i class="fa fa-calendar"></i></span>
                             </div>
                         </div>
                         <h6 class="mb-3">Enter Time</h6>
@@ -272,64 +274,75 @@
                         <div class="mb-3">
                             <label class="form-label">From</label>
                             <div class="input-group bootstrap-timepicker">
-                                <input id="timepicker-from" name="time_from" type="text" class="form-control form-control-sm" />
-                                <span class="input-group-text"><i class="fa fa-clock"></i></span>
+                                <input id="timepicker-from" type="text" class="form-control form-control-sm" />
+                                <span class="input-group-text input-group-addon"><i class="fa fa-clock"></i></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">To</label>
                             <div class="input-group bootstrap-timepicker">
-                                <input id="timepicker-to" name="time_to" type="text" class="form-control form-control-sm" />
-                                <span class="input-group-text"><i class="fa fa-clock"></i></span>
+                                <input id="timepicker-to" type="text" class="form-control form-control-sm" />
+                                <span class="input-group-text input-group-addon"><i class="fa fa-clock"></i></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Request priest:</label>
-                            <select class="form-select priest-select" id="priest-select" name="assign_to">
+                            <select class="form-select priest-select" id="priest-select">
                                 <option value="" selected>Choose a priest</option>
                                 @foreach(get_all_priest() as $priest)
-                                    <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
+
+                                <option value="{{ $priest->id }}">{{ $priest->firstname }}
+                                {{ $priest->lastname }}</option>
                                 @endforeach
+
                             </select>
                         </div>
                     </div>
                     <div class="col-7">
                         <div class="mb-3">
                             <label class="form-label">Venue:</label>
-                            <input class="form-control form-control-sm venue" id="venue" name="venue" type="text" placeholder="venue..." />
+                            <input class="form-control form-control-sm venue" id="venue" type="text"
+                                placeholder="venue..." />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Address:</label>
-                            <input class="form-control form-control-sm address" id="address" name="address" type="text" placeholder="address..." />
+                            <input class="form-control form-control-sm address" id="address" type="text"
+                                placeholder="address..." />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Purpose:</label>
                             @foreach(get_all_liturgical() as $priest)
-                                @if($priest->id != 1)
-                                    <div class="form-check mb-2">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    data-val="{{ $priest->title }}" data-id="{{ $priest->id }}">
-                                        <label class="form-check-label">{{ $priest->title }}</label>
-                                    </div>
-                                @endif
+
+                            @if($priest->id != 1)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    data-val="{{$priest->title}}" data-id="{{$priest->id}}">
+                                <label class="form-check-label" for="{{$priest->title}}">
+                                    {{$priest->title}}
+                                </label>
+                            </div>
+                            @endif
+
+
                             @endforeach
-                            <input type="hidden" id="liturgical_id" name="liturgical_id">
+
                         </div>
                         <div class="mb-3">
                             <label class="form-label">If others, please specify:</label>
-                            <input class="form-control form-control-sm others" name="others" type="text" placeholder="if others, please specify..." disabled />
+                            <input class="form-control form-control-sm others" type="text"
+                                placeholder="if others, please specify..." disabled />
                         </div>
                     </div>
                 </div>
+
             </div>
             <div class="modal-footer">
                 <a href="javascript:;" class="btn btn-white btn-xs" data-bs-dismiss="modal">Close</a>
                 <a href="javascript:;" class="btn btn-primary btn-xs" id="save-edit-schedule">Submit</a>
             </div>
-        </form>
+        </div>
     </div>
 </div>
-
 
 @endsection
 
@@ -396,44 +409,35 @@ $(document).on('click', '#save-schedule', function() {
 });
 
 $(document).on('click', '#save-edit-schedule', function() {
-    let priestId = $('.priest-select').val();
-    let schedId = window.currentSchedId || null; // Set during onclickEdit()
- 
-    const dateValue = $('#datepicker-disabled-past input').val();
-    const formattedDate = new Date(dateValue).toISOString().split('T')[0]; // Converts to YYYY-MM-DD
-
+    let isValid = true;
+    const schedId = $('#update_sched').val();
+    let priestId = $('#modal-edit-own-sched .priest-select').val();
+    
+    const dateInput = $('#datepicker-disabled-past input');
+    const dateValue = dateInput.val().trim();
+    
+    
     const data = {
         schedId: schedId,
-        // date: $('#modal-edit-own-sched #datepicker-disabled-past input').val(),
-        date: formattedDate,
+        date: dateValue,
         time_from: $('#modal-edit-own-sched #timepicker-from').val(),
         time_to: $('#modal-edit-own-sched #timepicker-to').val(),
         venue: $('#modal-edit-own-sched .venue').val(),
         address: $('#modal-edit-own-sched .address').val(),
-        purpose: $('#modal-edit-own-sched input[name="flexRadioDefault"]:checked').attr('data-val'),
-        liturgical_id: $('#modal-edit-own-sched input[name="flexRadioDefault"]:checked').attr('data-id'),
-        others: $('#modal-edit-own-sched .others').val(),
+        purpose: $('input[name="flexRadioDefault"]:checked').attr('data-val'),
+        liturgical_id: $('input[name="flexRadioDefault"]:checked').attr('data-id'),
+        others: $('.others').val(),
         sched_type: 'own_sched',
         assign_to: priestId,
         _token: $('meta[name="csrf-token"]').attr('content'),
     };
-
-    // Validate required fields
-    if (!data.schedId) {
-        alert('Schedule ID is missing.');
-        return;
-    }
-    if (!data.date || !data.time_from || !data.time_to) {
-        alert('Date and time fields are required.');
-        return;
-    }
-    if (!data.purpose) {
-        alert('Please select a purpose.');
-        return;
-    }
+    
+    console.log("Date:", data.date);
+    console.log("Time From:", data.time_from);
+    console.log("Time To:", data.time_to);
 
     $.ajax({
-        url: '{{ route("schedules.store") }}', // same endpoint for both create/update
+        url: `/schedules-store`, // Use the schedule ID in the URL
         method: 'POST',
         data: data,
         success: function(response) {
@@ -442,19 +446,10 @@ $(document).on('click', '#save-edit-schedule', function() {
         },
         error: function(xhr) {
             console.log(xhr);
-            if (xhr.status === 422 && xhr.responseJSON.errors) {
-                let allErrors = '';
-                $.each(xhr.responseJSON.errors, function(field, messages) {
-                    allErrors += messages[0] + '\n';
-                });
-                alert("Validation error:\n" + allErrors);
-            } else {
-                alert(xhr.responseJSON.message || 'Something went wrong!');
-            }
+            alert(xhr.responseJSON.message || 'Something went wrong!');
         }
     });
 });
-
 /*
 Template Name: Color Admin - Responsive Admin Dashboard Template build with Twitter Bootstrap 5
 Version: 5.4.1
@@ -730,20 +725,10 @@ function getActionButtons(item, userRole, userName) {
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
             </p>
         `;
-        } else if (item.assign_to === <?= Auth::user()->id ?> && item.created_by === <?= Auth::user()->id ?>) {
-            return `
-            <p class="mb-0 d-flex justify-content-end">
-            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>
-            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
-            ` : ''}
-        </p>
-        `;
         } else if (item.created_by === <?= Auth::user()->id ?>){
             return `
             <p class="mb-0 d-flex justify-content-end">
-            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
@@ -788,9 +773,7 @@ function getActionButtons(item, userRole, userName) {
     
 }
 
-
-function onclickEdit(userId, schedId, status = 1) {
-    // Fetch the current request data
+function onclickEdit(schedId) {
     $.ajax({
         url: `/list-request/${schedId}`,
         method: 'GET',
@@ -798,42 +781,39 @@ function onclickEdit(userId, schedId, status = 1) {
         success: function(response) {
             const data = response.data;
 
-            // Populate the modal fields
-            $('#modal-edit-own-sched #datepicker-disabled-past input').val(data.date);
-            $('#modal-edit-own-sched #timepicker-from').val(data.time_from);
-            $('#modal-edit-own-sched #timepicker-to').val(data.time_to);
+            let parsedDate = new Date(data.date);
+
+            // Format it to YYYY-MM-DD
+            let formattedDate = parsedDate.getFullYear() + "-" +
+            String(parsedDate.getMonth() + 1).padStart(2, '0') + "-" +
+            String(parsedDate.getDate()).padStart(2, '0');
+            
+            // Set time values
+            $('#datepicker-disabled-past input').val(formattedDate);
+            $('#modal-edit-own-sched #timepicker-from').val(data.time_from).timepicker('setTime', data.time_from); // Start time
+            $('#modal-edit-own-sched #timepicker-to').val(data.time_to).timepicker('setTime', data.time_to); // End time
             $('#modal-edit-own-sched #venue').val(data.venue);
             $('#modal-edit-own-sched #address').val(data.address);
             $('#modal-edit-own-sched .priest-select').val(data.assign_to);
+            $('#modal-edit-own-sched #update_sched').val(schedId);
 
-            // const timeFrom = convertTo12Hour(data.time_from);
-            // const timeTo = convertTo12Hour(data.time_to);
-
-            // $('#modal-edit-own-sched #timepicker-from').val(timeFrom);
-            // $('#modal-edit-own-sched #timepicker-to').val(timeTo);
-
-            // Set the correct liturgical purpose radio button
-            let purposeSet = false;
+            console.log(data.time_from, data.time_to);
+            // Set the correct purpose radio button
             $('input[name="flexRadioDefault"]').each(function () {
-                const radioVal = $(this).attr('data-val').toLowerCase();
-                if (radioVal === data.purpose.toLowerCase()) {
-                    $(this).prop('checked', true); // Select the matching radio button
-                    purposeSet = true;
-                } else {
-                    $(this).prop('checked', false); // Deselect other radio buttons
+                if ($(this).data('val').toLowerCase() === data.purpose.toLowerCase()) {
+                    $(this).prop('checked', true);
                 }
             });
 
-            // If "others" was selected, enable and populate the field
-            if (!purposeSet || data.purpose.toLowerCase() === 'others') {
+            // Enable "others" field if applicable
+            if (data.purpose.toLowerCase() === 'others') {
                 $('.others').prop('disabled', false).val(data.others || '');
-                $('input[name="flexRadioDefault"][data-val="Others"]').prop('checked', true);
             } else {
                 $('.others').prop('disabled', true).val('');
             }
 
-            // Set schedule ID globally for saving
-            window.currentSchedId = schedId;
+            // Set the schedule ID in the hidden input field
+            $('#schedule-id').val(schedId);
 
             // Open the modal
             $('#modal-edit-own-sched').modal('show');

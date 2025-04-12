@@ -236,9 +236,41 @@ class ScheduleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request)
     {
-        //
+        $event_id = $request->input('schedId');
+        $time_from_24 = date('H:i:s', strtotime($request->input('time_from')));
+            $time_to_24 = date('H:i:s', strtotime($request->input('time_to')));
+            $date_now = $request->input('date');
+
+
+            $validated['date'] = $date_now;
+            $validated['time_from'] = $time_from_24;
+            $validated['time_to'] = $time_to_24;
+
+            $validated['created_by'] = Auth::user()->id;
+            $validated['created_by_name'] = Auth::user()->prefix . ' ' . Auth::user()->firstname . " " . Auth::user()->lastname;
+            $validated['assign_to'] =  $request->input('assign_to');
+            $validated['assign_by'] =  Auth::user()->id;
+            $validated['status'] = '1';
+            $validated['is_assign'] = '0';
+        $schedule = Schedule::findOrFail($request->input('schedId'));
+
+        // Update the schedule with the validated data
+        $schedule->update([
+            'date' => $validated['date'],
+            'time_from' => $validated['time_from'],
+            'time_to' => $validated['time_to'],
+            'venue' => $validated['venue'],
+            'address' => $validated['address'],
+            'purpose' => $validated['purpose'],
+            'liturgical_id' => $validated['liturgical_id'],
+            'others' => $validated['others'],
+            'sched_type' => $validated['sched_type'],
+            'assign_to' => $validated['assign_to'],
+        ]);
+
+        return response()->json(['message' => 'Schedule updated successfully!'], 200);
     }
 
     /**
@@ -303,7 +335,7 @@ class ScheduleController extends Controller
             ], 400);
         }
 
-        if ($existingSchedule && $existingSchedule->assign_to == $request->input('assign_to')) {
+        if (!$isUpdate && $existingSchedule && $existingSchedule->assign_to == $request->input('assign_to')) {
             return response()->json([
                 'message' => 'Date and time is taken for the requested priest'
             ], 400);

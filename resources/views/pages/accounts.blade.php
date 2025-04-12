@@ -601,6 +601,19 @@ $('#editAccountForm').on('submit', function(event) {
     const userId = $(this).data('userId');
     const formData = new FormData(this);
 
+        let contactNumber = $('#contact').val();
+        if (contactNumber.length !== 11) {
+            alert('Contact number must be exactly 11 digits.');
+            return;
+        }
+
+        let email = $('#email').val();
+        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(email)) {
+            alert('Invalid email format. Please enter a valid email.');
+            return;
+        }
+
     $.ajax({
         url: `/user/${userId}/update`, // Replace with your update URL
         method: 'POST',
