@@ -92,7 +92,7 @@
                         <select class="form-select" id="priest-select" name="priest_id">
                             <option value="" selected>Choose a priest</option>
                             @foreach(get_all_priest() as $priest)
-                            <option value="{{ $priest->id }}">{{ $priest->name }}</option>
+                            <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -711,7 +711,7 @@ function getStatusBadge(status,role) {
     const statuses = {
         1: '<span class="badge bg-yellow text-black">Pending</span>',
         2: '<span class="badge bg-primary">Accepted by Parish priest</span>',
-        3: '<span class="badge bg-danger">Declined</span>',
+        3: '<span class="badge bg-danger">Referred to another priest</span>',
         4: '<span class="badge bg-info text-black">Complete</span>',
         5: '<span class="badge bg-secondary">Archived</span>',
         default: '<span class="badge bg-success">Accepted by priest</span>'
@@ -723,40 +723,39 @@ function getActionButtons(item, userRole, userName) {
     console.log('assign_to_name:', item.assign_to_name);
     
     if (item.status === 1) {
-        if(item.created_by === <?= Auth::user()->id ?>){
+        if(item.assign_to_name === "N/A") {
             return `
             <p class="mb-0 d-flex justify-content-end">
-            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>` } 
-            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
-            ` : ''}
-        </p>
-        `;
-        } else if (item.assign_to_name === "N/A") {
-            return `
-            <p class="mb-0 d-flex justify-content-end">
+                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
             </p>
         `;
         } else if (item.assign_to === <?= Auth::user()->id ?> && item.created_by === <?= Auth::user()->id ?>) {
             return `
             <p class="mb-0 d-flex justify-content-end">
-            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id},6)">Accept</a>` } 
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;
-        }else if (item.assign_to === <?= Auth::user()->id ?>) {
+        } else if (item.created_by === <?= Auth::user()->id ?>){
             return `
             <p class="mb-0 d-flex justify-content-end">
-            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id},6)">Accept</a>` } 
-            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
+        </p>
+        `;
+        } else if (item.assign_to === <?= Auth::user()->id ?>) {
+            return `
+            <p class="mb-0 d-flex justify-content-end">
+            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept(${item.schedule_id},6)">Accept</a>` } 
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
+           
         </p>
         `;
         }
@@ -776,8 +775,11 @@ function getActionButtons(item, userRole, userName) {
     }
         return `
             <p class="mb-0 d-flex justify-content-end">
-            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id},2)">Approve</a>` } 
+            ${(userRole === 'parish_priest') ? `
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove('<?= Auth::user()->id ?>', ${item.schedule_id},2)">Approve</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
+            ` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>` } 
+            
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
@@ -911,7 +913,8 @@ function onclickAssignPost(id) {
         dataType: 'json',
         data: {
             user_id: id,
-            sched_id: $('.assign_post').attr('data-id')
+            sched_id: $('.assign_post').attr('data-id'),
+            status: 1,
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -943,15 +946,13 @@ function onclickAssignPost(id) {
 
 }
 
-function onclickAccept(id, sched_id,status=9) {
-
+function onclickAccept(sched_id,status=9) {
 
     $.ajax({
-        url: `/assign_priest`,
+        url: `/acceptRequest`,
         method: 'POST',
         dataType: 'json',
         data: {
-            user_id: id,
             sched_id: sched_id,
             status: status,
         },
@@ -959,7 +960,6 @@ function onclickAccept(id, sched_id,status=9) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-
             if (response.status == 1) {
                 $('#modal-dialog-assign-to-priest').modal('hide');
                 message({
@@ -975,12 +975,51 @@ function onclickAccept(id, sched_id,status=9) {
                     icon: 'error'
                 });
             }
-
         },
         error: function(xhr, status, error) {
             console.error('Error updating user:', error);
         }
     });
+}
+
+function onclickApprove(id, sched_id,status=9) {
+
+
+$.ajax({
+    url: `/assign_priest`,
+    method: 'POST',
+    dataType: 'json',
+    data: {
+        user_id: id,
+        sched_id: sched_id,
+        status: status,
+    },
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    success: function(response) {
+
+        if (response.status == 1) {
+            $('#modal-dialog-assign-to-priest').modal('hide');
+            message({
+                title: 'Success!',
+                message: response.message,
+                icon: 'success'
+            });
+            getList();
+        } else {
+            message({
+                title: 'Error!',
+                message: response.message,
+                icon: 'error'
+            });
+        }
+
+    },
+    error: function(xhr, status, error) {
+        console.error('Error updating user:', error);
+    }
+});
 
 
 }

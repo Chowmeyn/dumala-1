@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\DB;
@@ -176,16 +177,20 @@ class RequestController extends Controller
             return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
         }
 
+        // Update the current schedule with the referred priest
+        $schedule->assign_to = $request->priest_id;
+        $schedule->assign_to_name = User::find($request->priest_id)->firstname . ' ' . User::find($request->priest_id)->lastname;
+        $schedule->status = 3; // Assuming 3 means declined
+        $schedule->save();
+
+        // Optionally, log the decline reason in the DeclinedRequest table
         DeclinedRequest::create([
             'schedule_id' => $id,
             'referred_priest_id' => $request->priest_id,
             'reason' => $request->reason,
         ]);
 
-        $schedule->status = 3; // Assuming 2 means declined
-        $schedule->save();
-
-        return response()->json(['success' => true, 'message' => 'Request declined successfully.']);
+        return response()->json(['success' => true, 'message' => 'Request updated with the referred priest successfully.']);
     }
 
 
@@ -237,13 +242,13 @@ class RequestController extends Controller
      */
     public function deleteRequest($id)
     {
-        $request = DB::table('schedule_events_view_v2')->where('schedule_id', $id)->first();
+        $request = DB::table('schedules')->where('id', $id)->first();
 
         if (!$request) {
             return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
         }
 
-        DB::table('schedule_events_view_v2')->where('schedule_id', $id)->delete();
+        DB::table('schedules')->where('id', $id)->delete();
 
         return response()->json(['success' => true, 'message' => 'Request deleted successfully.']);
     }

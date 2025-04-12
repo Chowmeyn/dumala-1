@@ -502,7 +502,7 @@ var handleCalendarDemo = function() {
             if (status === 1) {
                 statusBadge = '<span class="badge bg-yellow text-black">Pending</span>';
             } else if (status === 2) {
-                statusBadge = '<span class="badge bg-primary">Accepted</span>';
+                statusBadge = '<span class="badge bg-primary">Accepted by Parish Priest</span>';
             } else if (status === 3) {
                 statusBadge = '<span class="badge bg-danger">Declined</span>';
             } else if (status === 4) {

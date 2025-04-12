@@ -329,7 +329,11 @@ class ScheduleController extends Controller
         $validated['created_by_name'] = Auth::user()->prefix . ' ' . Auth::user()->firstname . " " . Auth::user()->lastname;
         $validated['assign_to'] = $request->input('assign_to');
         $validated['assign_by'] = Auth::user()->id;
-        $validated['status'] = '1';
+        if ($validated['assign_by'] == $validated['assign_to']) {
+            $validated['status'] = '6'; // Set status to 6
+        } else {
+            $validated['status'] = '1'; // Default status
+        }
         $validated['is_assign'] = ($sched_type === 'own_sched')
             ? (($request->input('assign_to') !== null) ? '1' : '0')
             : '1';
@@ -415,6 +419,15 @@ class ScheduleController extends Controller
             'message' => "Success Archive Schedule!"
         ], 200);
 
+    }
+
+    public function acceptRequest(Request $request)
+    {
+        $schedule = Schedule::findOrFail($request->input('sched_id'));
+        $schedule->status = $request->input('status'); // Only update the status
+        $schedule->save();
+
+    return response()->json(['status' => 1, 'message' => 'Schedule status updated successfully.']);
     }
 
 }
