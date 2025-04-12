@@ -269,16 +269,43 @@ class ScheduleController extends Controller
         $time_to_24 = date('H:i:s', strtotime($request->input('time_to')));
         $date_now = $request->input('date');
 
+        $time_to_buffered = date('H:i:s', strtotime($time_to_24 . ' +1 hour'));
+        
         // Check if the date and time are already taken with status "accepted by parish priest"
         $existingSchedule = Schedule::where('date', $date_now)
-            ->where('time_from', $time_from_24)
-            ->where('time_to', $time_to_24)
             ->where('status', '!=', 3)
+            ->where(function ($query) use ($time_from_24, $time_to_buffered) {
+                $query->where('time_from', '<=', $time_to_buffered)
+                    ->where('time_to', '>=', $time_from_24);
+            })
             ->first();
 
-        if ($existingSchedule) {
+        if ($time_from_24 === $time_to_24) {
             return response()->json([
-                'message' => 'Date and time is taken'
+                'message' => 'Start time and end time cannot be the same.'
+            ], 400);
+        }        
+
+        $start = strtotime($time_from_24);
+        $end = strtotime($time_to_24);
+
+        if ($end <= $start) {
+            return response()->json([
+                'message' => 'End time must be later than start time.'
+            ], 400);
+        }
+
+        $durationInMinutes = ($end - $start) / 60;
+
+        if ($durationInMinutes > 120) {
+            return response()->json([
+                'message' => 'Schedule duration cannot exceed 2 hours.'
+            ], 400);
+        }
+
+        if ($existingSchedule && $existingSchedule->assign_to == $request->input('assign_to')) {
+            return response()->json([
+                'message' => 'Date and time is taken for the requested priest'
             ], 400);
         }
 

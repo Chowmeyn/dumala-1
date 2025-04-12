@@ -30,6 +30,8 @@ class RequestController extends Controller
         $month = $request->input('month');
         $date_range = $request->input('date_range');
         $perPage = 10; // Items per page
+        $time_from_24 = date('H:i:s', strtotime($request->input('time_from')));
+        $time_to_24 = date('H:i:s', strtotime($request->input('time_to')));
     
         $query = DB::table('schedule_events_view_v2')
         ->leftJoin('declined_requests', 'schedule_events_view_v2.schedule_id', '=', 'declined_requests.schedule_id')

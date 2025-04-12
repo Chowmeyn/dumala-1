@@ -250,23 +250,21 @@
 
 <div class="modal fade" id="modal-edit-own-sched">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <form id="edit-schedule-form" class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create schedule</h5>
+                <h5 class="modal-title">Edit Schedule</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
             </div>
             <div class="modal-body">
-
                 <div class="row">
                     <div class="col-5">
                         <h6 class="mb-3 mt-3">Enter Date</h6>
                         <hr>
                         <div class="mb-3">
-                            <label class="form-label" for="exampleInputEmail1">Date</label>
-                            <div class="input-group date" id="datepicker-disabled-past" data-date-format="yyyy-m-d"
-                                data-date-start-date="Date.default">
-                                <input type="text" class="form-control form-control-sm" placeholder="Select Date" />
-                                <span class="input-group-text input-group-addon"><i class="fa fa-calendar"></i></span>
+                            <label class="form-label">Date</label>
+                            <div class="input-group date" id="datepicker-disabled-past" data-date-format="yyyy-m-d">
+                                <input type="text" name="date" class="form-control form-control-sm" placeholder="Select Date" />
+                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                             </div>
                         </div>
                         <h6 class="mb-3">Enter Time</h6>
@@ -274,73 +272,61 @@
                         <div class="mb-3">
                             <label class="form-label">From</label>
                             <div class="input-group bootstrap-timepicker">
-                                <input id="timepicker-from" type="text" class="form-control form-control-sm" />
-                                <span class="input-group-text input-group-addon"><i class="fa fa-clock"></i></span>
+                                <input id="timepicker-from" name="time_from" type="text" class="form-control form-control-sm" />
+                                <span class="input-group-text"><i class="fa fa-clock"></i></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">To</label>
                             <div class="input-group bootstrap-timepicker">
-                                <input id="timepicker-to" type="text" class="form-control form-control-sm" />
-                                <span class="input-group-text input-group-addon"><i class="fa fa-clock"></i></span>
+                                <input id="timepicker-to" name="time_to" type="text" class="form-control form-control-sm" />
+                                <span class="input-group-text"><i class="fa fa-clock"></i></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Request priest:</label>
-                            <select class="form-select priest-select" id="priest-select">
+                            <select class="form-select priest-select" id="priest-select" name="assign_to">
                                 <option value="" selected>Choose a priest</option>
                                 @foreach(get_all_priest() as $priest)
-
-                                <option value="{{ $priest->id }}">{{ $priest->firstname }}
-                                {{ $priest->lastname }}</option>
+                                    <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
                                 @endforeach
-
                             </select>
                         </div>
                     </div>
                     <div class="col-7">
                         <div class="mb-3">
                             <label class="form-label">Venue:</label>
-                            <input class="form-control form-control-sm venue" id="venue" type="text"
-                                placeholder="venue..." />
+                            <input class="form-control form-control-sm venue" id="venue" name="venue" type="text" placeholder="venue..." />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Address:</label>
-                            <input class="form-control form-control-sm address" id="address" type="text"
-                                placeholder="address..." />
+                            <input class="form-control form-control-sm address" id="address" name="address" type="text" placeholder="address..." />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Purpose:</label>
                             @foreach(get_all_liturgical() as $priest)
-
-                            @if($priest->id != 1)
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    data-val="{{$priest->title}}" data-id="{{$priest->id}}">
-                                <label class="form-check-label" for="{{$priest->title}}">
-                                    {{$priest->title}}
-                                </label>
-                            </div>
-                            @endif
-
-
+                                @if($priest->id != 1)
+                                    <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                    data-val="{{ $priest->title }}" data-id="{{ $priest->id }}">
+                                        <label class="form-check-label">{{ $priest->title }}</label>
+                                    </div>
+                                @endif
                             @endforeach
-
+                            <input type="hidden" id="liturgical_id" name="liturgical_id">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">If others, please specify:</label>
-                            <input class="form-control form-control-sm others" type="text"
-                                placeholder="if others, please specify..." disabled />
+                            <input class="form-control form-control-sm others" name="others" type="text" placeholder="if others, please specify..." disabled />
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer">
                 <a href="javascript:;" class="btn btn-white btn-xs" data-bs-dismiss="modal">Close</a>
-                <a href="javascript:;" class="btn btn-primary btn-xs" id="save-schedule">Submit</a>
+                <a href="javascript:;" class="btn btn-primary btn-xs" id="save-edit-schedule">Submit</a>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -361,6 +347,18 @@ $(document).ready(function() {
         }
     });
 });
+
+$(document).on('change', 'input[name="purpose"]', function () {
+    const liturgicalId = $(this).data('id');
+    $('#liturgical_id').val(liturgicalId);
+
+    if ($(this).val().toLowerCase() === 'others') {
+        $('.others').prop('disabled', false);
+    } else {
+        $('.others').prop('disabled', true).val('');
+    }
+});
+
 $('#requests').addClass('active');
 let currentPage = 1;
 getList();
@@ -394,6 +392,66 @@ $(document).on('click', '#save-schedule', function() {
             console.log(xhr);
             alert(xhr.responseJSON.message);
         },
+    });
+});
+
+$(document).on('click', '#save-edit-schedule', function() {
+    let priestId = $('.priest-select').val();
+    let schedId = window.currentSchedId || null; // Set during onclickEdit()
+ 
+    const dateValue = $('#datepicker-disabled-past input').val();
+    const formattedDate = new Date(dateValue).toISOString().split('T')[0]; // Converts to YYYY-MM-DD
+
+    const data = {
+        schedId: schedId,
+        // date: $('#modal-edit-own-sched #datepicker-disabled-past input').val(),
+        date: formattedDate,
+        time_from: $('#modal-edit-own-sched #timepicker-from').val(),
+        time_to: $('#modal-edit-own-sched #timepicker-to').val(),
+        venue: $('#modal-edit-own-sched .venue').val(),
+        address: $('#modal-edit-own-sched .address').val(),
+        purpose: $('#modal-edit-own-sched input[name="flexRadioDefault"]:checked').attr('data-val'),
+        liturgical_id: $('#modal-edit-own-sched input[name="flexRadioDefault"]:checked').attr('data-id'),
+        others: $('#modal-edit-own-sched .others').val(),
+        sched_type: 'own_sched',
+        assign_to: priestId,
+        _token: $('meta[name="csrf-token"]').attr('content'),
+    };
+
+    // Validate required fields
+    if (!data.schedId) {
+        alert('Schedule ID is missing.');
+        return;
+    }
+    if (!data.date || !data.time_from || !data.time_to) {
+        alert('Date and time fields are required.');
+        return;
+    }
+    if (!data.purpose) {
+        alert('Please select a purpose.');
+        return;
+    }
+
+    $.ajax({
+        url: '{{ route("schedules.store") }}', // same endpoint for both create/update
+        method: 'POST',
+        data: data,
+        success: function(response) {
+            alert(response.message);
+            location.reload(); // Refresh view after successful update
+        },
+        error: function(xhr) {
+            console.log(xhr);
+            if (xhr.status === 422 && xhr.responseJSON.errors) {
+                let allErrors = '';
+                $.each(xhr.responseJSON.errors, function(field, messages) {
+                    allErrors += messages[0] + '\n';
+                });
+                alert("Validation error:\n" + allErrors);
+            } else {
+                alert(xhr.responseJSON.message || 'Something went wrong!');
+            }
+        }
     });
 });
 
@@ -665,8 +723,18 @@ function getActionButtons(item, userRole, userName) {
     console.log('assign_to_name:', item.assign_to_name);
     
     if (item.status === 1) {
-        if(item.assign_to_name === "N/A"){
-        return `
+        if(item.created_by === <?= Auth::user()->id ?>){
+            return `
+            <p class="mb-0 d-flex justify-content-end">
+            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>` } 
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
+            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+            ` : ''}
+        </p>
+        `;
+        } else if (item.assign_to_name === "N/A") {
+            return `
             <p class="mb-0 d-flex justify-content-end">
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
             </p>
@@ -686,16 +754,6 @@ function getActionButtons(item, userRole, userName) {
             <p class="mb-0 d-flex justify-content-end">
             ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept('<?= Auth::user()->id ?>', ${item.schedule_id},6)">Accept</a>` } 
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
-            ` : ''}
-        </p>
-        `;
-        } else if (item.created_by === <?= Auth::user()->id ?>) {
-            return `
-            <p class="mb-0 d-flex justify-content-end">
-            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>` } 
-            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
@@ -732,26 +790,48 @@ function getActionButtons(item, userRole, userName) {
 function onclickEdit(userId, schedId, status = 1) {
     // Fetch the current request data
     $.ajax({
-        url: `/list-request/${schedId}`, // Replace with the correct endpoint to fetch request details
+        url: `/list-request/${schedId}`,
         method: 'GET',
         dataType: 'json',
         success: function(response) {
             const data = response.data;
 
-            // Populate the modal fields with the request data
+            // Populate the modal fields
             $('#modal-edit-own-sched #datepicker-disabled-past input').val(data.date);
             $('#modal-edit-own-sched #timepicker-from').val(data.time_from);
             $('#modal-edit-own-sched #timepicker-to').val(data.time_to);
             $('#modal-edit-own-sched #venue').val(data.venue);
             $('#modal-edit-own-sched #address').val(data.address);
             $('#modal-edit-own-sched .priest-select').val(data.assign_to);
-            $('input[name="flexRadioDefault"][data-id="' + data.liturgical_id + '"]').prop('checked', true);
 
-            if (data.purpose.toLowerCase() === "others") {
-                $('.others').prop('disabled', false).val(data.others);
+            // const timeFrom = convertTo12Hour(data.time_from);
+            // const timeTo = convertTo12Hour(data.time_to);
+
+            // $('#modal-edit-own-sched #timepicker-from').val(timeFrom);
+            // $('#modal-edit-own-sched #timepicker-to').val(timeTo);
+
+            // Set the correct liturgical purpose radio button
+            let purposeSet = false;
+            $('input[name="flexRadioDefault"]').each(function () {
+                const radioVal = $(this).attr('data-val').toLowerCase();
+                if (radioVal === data.purpose.toLowerCase()) {
+                    $(this).prop('checked', true); // Select the matching radio button
+                    purposeSet = true;
+                } else {
+                    $(this).prop('checked', false); // Deselect other radio buttons
+                }
+            });
+
+            // If "others" was selected, enable and populate the field
+            if (!purposeSet || data.purpose.toLowerCase() === 'others') {
+                $('.others').prop('disabled', false).val(data.others || '');
+                $('input[name="flexRadioDefault"][data-val="Others"]').prop('checked', true);
             } else {
                 $('.others').prop('disabled', true).val('');
             }
+
+            // Set schedule ID globally for saving
+            window.currentSchedId = schedId;
 
             // Open the modal
             $('#modal-edit-own-sched').modal('show');
@@ -761,6 +841,14 @@ function onclickEdit(userId, schedId, status = 1) {
             alert('Failed to fetch request details.');
         }
     });
+}
+
+// Converts 24-hour format (HH:mm:ss) to 12-hour (hh:mm AM/PM)
+function convertTo12Hour(time24) {
+    const [hour, minute] = time24.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hour), parseInt(minute), 0);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
 }
 
 function onclickDelete(schedId) {

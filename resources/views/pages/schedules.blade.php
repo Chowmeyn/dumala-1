@@ -47,6 +47,7 @@
             <div id="external-events" class="fc-event-list" <?= $shouldHide ? '' : 'style="display: none;"' ?>>
                 <h5 class="mb-3">Priests</h5>
 
+                @if( Auth::user()->role !== 'secretary')
                 <label class="d-flex align-items-center mb-2" data-sched_id="1" data-color="#00acac">
                     <!-- <input type="checkbox" name="events[]" value="1" checked class="me-2">
                     <i class="fas fa-circle fa-fw fs-9px text-success me-2"></i>
@@ -57,7 +58,6 @@
                             <b>Unassigned</b>
                         </label>
                     </div>
-
                 </label>
 
                 <label class="d-flex align-items-center mb-2" data-sched_id="2" data-color="#348fe2">
@@ -71,7 +71,7 @@
                         </label>
                     </div>
                 </label>
-
+                @endif
 
                 @foreach(get_all_priest() as $priest)
 
@@ -586,7 +586,7 @@ var Calendar = function() {
 $(document).ready(function() {
     Calendar.init();
 });
-let selectedIds = ['<?=(Auth::user()->role === 'admin') ? "" : Auth::user()->id ?>'];
+let selectedIds = <?=(Auth::user()->role === 'admin') ? '[]' : '[' . Auth::user()->id . ']' ?>;
 function getEvents(val='') {
     let ret = {};
 
@@ -608,7 +608,8 @@ function getEvents(val='') {
     // Log the selectedIds array to check if it updates correctly
     console.log('Selected IDs:', selectedIds);
 
-
+    selectedIds = selectedIds.filter(id => id !== '');
+    
     $.ajax({
         url: '/get-events',
         method: 'GET',
