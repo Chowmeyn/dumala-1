@@ -34,13 +34,13 @@
                 @csrf
                 <div class="form-floating mb-20px">
                     <input type="text" name="email" class="form-control fs-13px h-45px border-0"
-                        placeholder="Email Address" id="email" />
+                        placeholder="Email Address" id="email" required/>
                     <label for="email" class="d-flex align-items-center text-gray-600 fs-13px">Email Address</label>
                     <div class="invalid-feedback" id="emailError"></div>
                 </div>
                 <div class="form-floating mb-20px position-relative">
                     <input type="password" name="password" class="form-control fs-13px h-45px border-0"
-                        placeholder="Password" id="password" />
+                        placeholder="Password" id="password" required/>
                     <label for="password" class="d-flex align-items-center text-gray-600 fs-13px">Password</label>
                     <div class="invalid-feedback" id="passwordError"></div>
                     <!-- Eye toggle icon -->

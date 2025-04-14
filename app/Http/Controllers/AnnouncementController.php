@@ -25,7 +25,7 @@ class AnnouncementController extends Controller
     
             // Fetch announcements from the database based on the type
             if ($type === 'all') {
-                $announcements = Announcement::where('status', $request->announcement_status)->orderBy('created_at', 'desc')->paginate(10);
+                $announcements = Announcement::where('status', $request->announcement_status)->orderBy('updated_at', 'desc')->paginate(10);
             } else {
                 $announcements = Announcement::where('status', $request->announcement_status)->where('announcement_type', $type) // Assuming 'type' is the column for announcement type
                     ->orderBy('created_at', 'desc')->paginate(10);

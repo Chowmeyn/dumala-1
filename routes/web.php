@@ -90,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/assign_priest', [App\Http\Controllers\ScheduleController::class, 'assign_priest'])->name('assign_priest');
     Route::post('/acceptRequest', [App\Http\Controllers\ScheduleController::class, 'acceptRequest'])->name('acceptRequest');
+    Route::post('/approveRequest', [App\Http\Controllers\ScheduleController::class, 'approveRequest'])->name('approveRequest');
     
     Route::post('/change-password', [UserController::class, 'changePassword']);
 

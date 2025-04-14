@@ -186,6 +186,29 @@ class ScheduleController extends Controller
                 return response()->json(['message' => 'Schedule not found.'], 404);
             }
 
+             // Check for overlapping schedules
+            $time_from = $sched->time_from;
+            $time_to = $sched->time_to;
+            $date = $sched->date;
+
+            $existingSchedule = Schedule::where('date', $date)
+                ->where('assign_to', $user->id)
+                ->where(function ($query) use ($time_from, $time_to) {
+                    $query->whereBetween('time_from', [$time_from, $time_to])
+                        ->orWhereBetween('time_to', [$time_from, $time_to])
+                        ->orWhere(function ($query) use ($time_from, $time_to) {
+                            $query->where('time_from', '<=', $time_from)
+                                    ->where('time_to', '>=', $time_to);
+                        });
+                })
+                ->first();
+
+            if ($existingSchedule) {
+                return response()->json([
+                    'message' => 'Priest is not available for the requested date and time.'
+                ], 400);
+            }
+
             $sched->assign_to = $user->id;
 
             $sched->assign_to_name = ($user->prefix == '') ? $user->firstname . ' ' . $user->lastname : $user->prefix . '.' . ' ' . $user->firstname . ' ' . $user->lastname;
@@ -335,12 +358,22 @@ class ScheduleController extends Controller
             ], 400);
         }
 
-        if (!$isUpdate && $existingSchedule && $existingSchedule->assign_to == $request->input('assign_to')) {
-            return response()->json([
-                'message' => 'Date and time is taken for the requested priest'
-            ], 400);
+        if (!$isUpdate) {
+            // Check if there is an existing schedule for the same priest
+            if ($existingSchedule && $existingSchedule->assign_to == $request->input('assign_to')) {
+                return response()->json([
+                    'message' => 'Date and time is taken for the requested priest'
+                ], 400);
+            }
+        } else {
+            // Check if the existing schedule conflicts with the updated schedule
+            if ($existingSchedule && $existingSchedule->id != $event_id && $existingSchedule->assign_to == $request->input('assign_to')) {
+                return response()->json([
+                    'message' => 'Date and time is taken for the requested priest'
+                ], 400);
+            }
         }
-
+        
         if ($sched_type != 'mass_sched') {
             $validated = $request->validate([
                 'venue' => 'required|string|max:255',
@@ -459,7 +492,15 @@ class ScheduleController extends Controller
         $schedule->status = $request->input('status'); // Only update the status
         $schedule->save();
 
-    return response()->json(['status' => 1, 'message' => 'Schedule status updated successfully.']);
+    return response()->json(['status' => 1, 'message' => 'Request status updated successfully.']);
     }
 
+    public function approveRequest(Request $request)
+    {
+        $schedule = Schedule::findOrFail($request->input('sched_id'));
+        $schedule->status = $request->input('status'); // Only update the status
+        $schedule->save();
+
+    return response()->json(['status' => 1, 'message' => 'Request status updated successfully.']);
+    }
 }

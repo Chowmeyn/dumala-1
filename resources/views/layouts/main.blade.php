@@ -353,6 +353,7 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editFirstnameProfile"
                                                 name="firstname" placeholder="First Name"
+                                                required
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important; ">
                                             <label for="editFirstnameProfile"
                                                 class="d-flex align-items-center fs-13px">First
@@ -363,6 +364,7 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editLastnameProfile"
                                                 name="lastname" placeholder="Last Name"
+                                                required
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important; ">
                                             <label for="editLastnameProfile"
                                                 class="d-flex align-items-center fs-13px">Last
@@ -373,12 +375,22 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <select class="form-control fs-15px" id="editRoleProfile" name="role"
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important;">
-                                                <option value="admin">Admin</option>
+                                                <!-- <option value="admin">Admin</option> -->
+                                                @if(Auth::user()->role === 'parish_priest')
                                                 <option value="parish_priest">Parish priest</option>
                                                 <option value="secretary">Secretary</option>
                                                 <option value="priest">Priest</option>
+                                                @endif
+                                                @if(Auth::user()->role === 'priest')
+                                                <option value="priest">Priest</option>
+                                                @endif
+                                                @if(Auth::user()->role === 'secretary')
+                                                <option value="secretary">Secretary</option>
+                                                @endif
+                                                @if(Auth::user()->role === 'parishioners' || Auth::user()->role === 'non_parishioners')
                                                 <option value="parishioners">Parishioners</option>
                                                 <option value="non_parishioners">Non-parishioners</option>
+                                                @endif
                                             </select>
                                             <label for="editRoleProfile" class="d-flex align-items-center fs-13px">User
                                                 Role</label>
@@ -410,6 +422,7 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="email" class="form-control fs-15px" id="editEmailProfile"
                                                 name="email" placeholder="Email"
+                                                required
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important; ">
                                             <label for="editEmailProfile"
                                                 class="d-flex align-items-center fs-13px">Email
@@ -610,6 +623,13 @@
 
         const userId = $(this).data('userId');
         const formData = new FormData(this);
+
+        let email = $('#editEmailProfile').val();
+        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(email)) {
+            alert('Invalid email format. Please enter a valid email.');
+            return;
+        }
 
         $.ajax({
             url: `/user/${userId}/update`, // Replace with your update URL

@@ -413,13 +413,10 @@ $(document).on('click', '#save-edit-schedule', function() {
     const schedId = $('#update_sched').val();
     let priestId = $('#modal-edit-own-sched .priest-select').val();
     
-    const dateInput = $('#datepicker-disabled-past input');
-    const dateValue = dateInput.val().trim();
-    
     
     const data = {
         schedId: schedId,
-        date: dateValue,
+        date: $('#modal-edit-own-sched #datepicker-disabled-past input').val(),
         time_from: $('#modal-edit-own-sched #timepicker-from').val(),
         time_to: $('#modal-edit-own-sched #timepicker-to').val(),
         venue: $('#modal-edit-own-sched .venue').val(),
@@ -721,7 +718,7 @@ function getActionButtons(item, userRole, userName) {
         if(item.assign_to_name === "N/A") {
             return `
             <p class="mb-0 d-flex justify-content-end">
-                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>
+                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit( ${item.schedule_id})">Edit</a>
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
             </p>
         `;
@@ -757,13 +754,44 @@ function getActionButtons(item, userRole, userName) {
             
         </p>
         `;
+    } else if(item.status === 3) { 
+        if (item.created_by === <?= Auth::user()->id ?>){
+            return `
+            <p class="mb-0 d-flex justify-content-end">
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
+            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+            ` : ''}
+        </p>
+        `;
+        } else if (item.assign_to === <?= Auth::user()->id ?>) {
+            return `
+            <p class="mb-0 d-flex justify-content-end">
+            ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept(${item.schedule_id},6)">Accept</a>` } 
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
+           
+        </p>
+        `;
+        }
+    }
+    if (item.created_by === <?= Auth::user()->id ?>){
+            return `
+            <p class="mb-0 d-flex justify-content-end">
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
+            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+            ` : ''}
+        </p>
+        `;
     }
         return `
             <p class="mb-0 d-flex justify-content-end">
             ${(userRole === 'parish_priest') ? `
-            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove('<?= Auth::user()->id ?>', ${item.schedule_id},2)">Approve</a>
+            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove(${item.schedule_id},2)">Approve</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
-            ` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit('<?= Auth::user()->id ?>', ${item.schedule_id},1)">Edit</a>` } 
+            ` : `` } 
             
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
@@ -962,15 +990,14 @@ function onclickAccept(sched_id,status=9) {
     });
 }
 
-function onclickApprove(id, sched_id,status=9) {
+function onclickApprove(sched_id,status=9) {
 
 
 $.ajax({
-    url: `/assign_priest`,
+    url: `/approveRequest`,
     method: 'POST',
     dataType: 'json',
     data: {
-        user_id: id,
         sched_id: sched_id,
         status: status,
     },
@@ -1089,7 +1116,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    alert("Request declined successfully.");
+                    alert("Request updated with the referred priest successfully.");
                     $("#modal-dialog-decline").modal("hide");
                     location.reload();
                 } else {
