@@ -302,6 +302,10 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="contact" name="contact"
                                                 placeholder="name@example.com"
+                                                name="contact" placeholder="Contact Number"
+                                                maxlength="11" pattern="\d{11}" inputmode="numeric"
+                                                required
+                                                title="Contact number must be 11 digits"
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important; ">
                                             <label for="contact" class="d-flex align-items-center fs-13px">Contact
                                                 Number</label>
@@ -403,6 +407,9 @@
                                         <div class="form-floating mb-0 mb-md-0">
                                             <input type="text" class="form-control fs-15px" id="editContact"
                                                 name="contact" placeholder="Contact Number"
+                                                maxlength="11" pattern="\d{11}" inputmode="numeric"
+                                                required
+                                                title="Contact number must be 11 digits"
                                                 style="border-bottom: 1px solid gray !important; border-top: 0px !important; border-right: 0px !important; border-left: 0px !important; border-radius: 0px !important; ">
                                             <label for="editContact" class="d-flex align-items-center fs-13px">Contact
                                                 Number</label>
@@ -528,9 +535,27 @@ $(document).ready(function() {
     $('#addAccountForm').on('submit', function(e) {
         e.preventDefault();
 
+        // Validate First Name
+        let firstName = $('#firstname').val();
+        if (!/^[a-zA-Z\s]+$/.test(firstName)) {
+            alert('First name cannot contain numbers or special characters.');
+            return;
+        }
+
+        // Validate Last Name
+        let lastName = $('#lastname').val();
+        if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+            alert('Last name cannot contain numbers or special characters.');
+            return;
+        }
+
         let contactNumber = $('#contact').val();
         if (contactNumber.length !== 11) {
             alert('Contact number must be exactly 11 digits.');
+            return;
+        }
+        if (!/^\d+$/.test(contactNumber)) {
+            alert('Contact number must contain only numbers.');
             return;
         }
 
@@ -601,13 +626,30 @@ $('#editAccountForm').on('submit', function(event) {
     const userId = $(this).data('userId');
     const formData = new FormData(this);
 
-        let contactNumber = $('#contact').val();
+    // Validate First Name
+        let firstName = $('#editFirstname').val();
+            if (!/^[a-zA-Z\s]+$/.test(firstName)) {
+                alert('First name cannot contain numbers or special characters.');
+                return;
+            }
+
+            // Validate Last Name
+            let lastName = $('#editLastname').val();
+            if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+                alert('Last name cannot contain numbers or special characters.');
+                return;
+        }
+        let contactNumber = $('#editContact').val();
         if (contactNumber.length !== 11) {
             alert('Contact number must be exactly 11 digits.');
             return;
         }
+        if (!/^\d+$/.test(contactNumber)) {
+            alert('Contact number must contain only numbers.');
+            return;
+        }
 
-        let email = $('#email').val();
+        let email = $('#editEmail').val();
         var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailPattern.test(email)) {
             alert('Invalid email format. Please enter a valid email.');

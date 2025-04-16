@@ -135,7 +135,7 @@
                 <p><strong>Requested by:</strong> <span id="event-requested-by"></span></p>
                 <p><strong>Venue:</strong> <span id="event-venue"></span></p>
                 <p><strong>Address:</strong> <span id="event-address"></span></p>
-                <p><strong>Additional Comment:</strong> <span id="event-comment"></span></p>
+                <!-- <p><strong>Additional Comment:</strong> <span id="event-comment"></span></p> -->
             </div>
             <div class="modal-footer border-0 d-flex justify-content-center modal-footer-detail">
                 
@@ -279,7 +279,7 @@
                         <option value="" selected>Choose a priest</option>
                         @foreach(get_all_priest() as $priest)
 
-                        <option value="{{ $priest->id }}">{{ $priest->name }}</option>
+                        <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
                         @endforeach
 
                     </select>
@@ -402,7 +402,35 @@ function UpdateBTN() {
 }
 
 
-
+function approveSched(scheduleId) {
+    $.ajax({
+        url: '/approveSchedule', // Backend route to handle approval
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token for security
+            sched_id: scheduleId, // Schedule ID to approve
+            status: 2 // Status for "Accepted by Parish Priest"
+        },
+        success: function(response) {
+            message({
+                title: 'Success!',
+                message: response.message,
+                icon: 'success'
+            });
+            $('#event-details-modal').modal('hide'); // Close the modal
+            setTimeout(() => {
+                location.reload(); // Reload the page to reflect changes
+            }, 2000);
+        },
+        error: function(xhr) {
+            message({
+                title: 'Error!',
+                message: xhr.responseJSON.message || 'An error occurred while approving the schedule.',
+                icon: 'error'
+            });
+        }
+    });
+}
 
 var handleCalendarDemo = function() {
     var containerEl = document.getElementById('external-events');
@@ -526,15 +554,23 @@ var handleCalendarDemo = function() {
             $('#event-comment').text(info.event._def.extendedProps.others || "None");
             $('#event-priest-id').val(info.event._def.extendedProps.assign_to_id);
 
-            if (info.event._def.extendedProps.status === 1) {
-                $('.modal-footer-detail').html(
-                    '<button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button>'
-                );
-            } else {
+            if (info.event._def.extendedProps.status === 6) {
+                let buttonsHtml = `
+                    <button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button>
+                `;
+
+                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest')
+                    buttonsHtml += `
+                        <button type="button" class="btn btn-primary px-4" id="approve-btn" onclick="approveSched(${info.event._def.extendedProps.schedule_id})">Approve</button>
+                    `;
+                @endif
+
+                $('.modal-footer-detail').html(buttonsHtml);
+            } if (info.event._def.extendedProps.status === 2){
                 
                 $('.modal-footer-detail').html(
                     '@if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest')<button type="button" class="btn btn-success px-4" id="complete-btn" onclick="completeSched(' +
-                    info.event._def.extendedProps.schedule_id + ')">Complete</button>@endif'
+                    info.event._def.extendedProps.schedule_id + ')">Mark as Complete</button>@endif'
                 );
                 
             }
@@ -821,21 +857,21 @@ $(document).on('click', '#save-schedule', function() {
 
 
 $('#save-event-btn').on('click', function() {
-    $('#timepicker-mass-from').val(function() {
-    var now = new Date();
-    var hours = now.getHours();
-    var minutes = now.getMinutes();
-    var ampm = hours >= 12 ? 'PM' : 'AM';
+    // $('#timepicker-mass-from').val(function() {
+    // var now = new Date();
+    // var hours = now.getHours();
+    // var minutes = now.getMinutes();
+    // var ampm = hours >= 12 ? 'PM' : 'AM';
     
-    hours = hours % 12; // Convert hour from 24-hour to 12-hour format
-    hours = hours ? hours : 12; // Hour '0' should be '12'
-    minutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero to minutes if needed
+    // hours = hours % 12; // Convert hour from 24-hour to 12-hour format
+    // hours = hours ? hours : 12; // Hour '0' should be '12'
+    // minutes = minutes < 10 ? '0' + minutes : minutes; // Add leading zero to minutes if needed
     
-    var currentTime = hours + ':' + minutes + ' ' + ampm;
-    console.log("currentTime::", currentTime);
+    // var currentTime = hours + ':' + minutes + ' ' + ampm;
+    // console.log("currentTime::", currentTime);
     
-    return currentTime;
-    });
+    // return currentTime;
+    // });
     var selectedDate = $('#datepicker-mass-input').val();
     var fromTime = $('#timepicker-mass-from').val();
     var toTime = $('#timepicker-mass-to').val();
@@ -906,7 +942,7 @@ $('#save-event-btn').on('click', function() {
                 sched_type: 'mass_sched',
             },
             success: function(response) {
-                alert('Event saved successfully.');
+                alert('Schedule was updated successfully!');
                 // Optionally, you can close the modal or reset the form here
                 $('#datepicker').val('');
                 $('#timepicker-mass-from').val('');

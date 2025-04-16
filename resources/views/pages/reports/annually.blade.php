@@ -31,7 +31,7 @@
                 <div class="col-md-2">
                     <select id="get-priest" class="form-select" onchange="getPriestId(this)">
                         @foreach(get_all_priest() as $priest)
-                        <option value="{{ $priest->id }}">{{ $priest->prefix  }}. {{ $priest->firstname }} {{ $priest->lastname }}</option>
+                        <option value="{{ $priest->id }}">{{ $priest->prefix  }} {{ $priest->firstname }} {{ $priest->lastname }}</option>
                         @endforeach
 
                     </select>

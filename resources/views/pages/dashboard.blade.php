@@ -664,7 +664,7 @@ $(document).ready(function() {
                             formatDate(item.created_at) + '" data-content="' +
                             encodeURIComponent(content) + '" data-title="' +
                             encodeURIComponent(
-                                item.title) + '">Click to see</a>' :
+                                item.title) + '">View more...</a>' :
                             content;
 
                         html += `

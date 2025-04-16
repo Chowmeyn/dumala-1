@@ -587,56 +587,56 @@ function getList(search = '', page = 1) {
                     `);
                 }
 
-                if (userRole === 'secretary' ) {
-                    tbody.append(`
-                        <!-- Main Row -->
-                        <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
-                            data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
-                            <td><img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" /></td>
-                            <td style="padding-top: 20px;">${item.created_by_name}</td>
-                            <td style="padding-top: 20px;">${item.purpose}</td>
-                            <td style="padding-top: 20px;">${item.date}</td>
-                            <td style="padding-top: 20px;">
-                                <span id="${arrowId}" class="ms-2 toggle-arrow"><i class="fa fa-ellipsis-h fs-30px"></i></span>
-                            </td>
-                        </tr>
-                        <!-- Collapsible Content -->
-                        <tr id="${rowId}" class="collapse fade">
-                            <td colspan="5">
-                                <div class="p-1 bg-light">
-                                    <div class="d-flex p-1">
-                                        <div class="flex-1">
-                                            <table class="table mb-2" style="border: none !important;">
-                                                <tbody>
-                                                    <tr>
-                                                        <td><strong>Requested Priest:</strong></td>
-                                                        <td>${item.assign_to_name || 'N/A'}</td>
-                                                        <td><strong>Time:</strong></td>
-                                                        <td>${item.time_from} - ${item.time_to}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Venue:</strong></td>
-                                                        <td>${item.venue || 'N/A'}</td>
-                                                        <td><strong>Status:</strong></td>
-                                                        <td>${getStatusBadge(item.status, item.role_model)}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Address:</strong></td>
-                                                        <td>${item.address || 'N/A'}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            ${getActionButtons(item, userRole)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `);
-                }
+                // if (userRole === 'secretary' ) {
+                //     tbody.append(`
+                //         <!-- Main Row -->
+                //         <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
+                //             data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
+                //             <td><img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" /></td>
+                //             <td style="padding-top: 20px;">${item.created_by_name}</td>
+                //             <td style="padding-top: 20px;">${item.purpose}</td>
+                //             <td style="padding-top: 20px;">${item.date}</td>
+                //             <td style="padding-top: 20px;">
+                //                 <span id="${arrowId}" class="ms-2 toggle-arrow"><i class="fa fa-ellipsis-h fs-30px"></i></span>
+                //             </td>
+                //         </tr>
+                //         <!-- Collapsible Content -->
+                //         <tr id="${rowId}" class="collapse fade">
+                //             <td colspan="5">
+                //                 <div class="p-1 bg-light">
+                //                     <div class="d-flex p-1">
+                //                         <div class="flex-1">
+                //                             <table class="table mb-2" style="border: none !important;">
+                //                                 <tbody>
+                //                                     <tr>
+                //                                         <td><strong>Requested Priest:</strong></td>
+                //                                         <td>${item.assign_to_name || 'N/A'}</td>
+                //                                         <td><strong>Time:</strong></td>
+                //                                         <td>${item.time_from} - ${item.time_to}</td>
+                //                                     </tr>
+                //                                     <tr>
+                //                                         <td><strong>Venue:</strong></td>
+                //                                         <td>${item.venue || 'N/A'}</td>
+                //                                         <td><strong>Status:</strong></td>
+                //                                         <td>${getStatusBadge(item.status, item.role_model)}</td>
+                //                                     </tr>
+                //                                     <tr>
+                //                                         <td><strong>Address:</strong></td>
+                //                                         <td>${item.address || 'N/A'}</td>
+                //                                     </tr>
+                //                                 </tbody>
+                //                             </table>
+                //                             ${getActionButtons(item, userRole)}
+                //                         </div>
+                //                     </div>
+                //                 </div>
+                //             </td>
+                //         </tr>
+                //     `);
+                // }
 
 
-                if (userRole === 'parishioners' || userRole === 'non_parishioners') {
+                if (userRole === 'parishioners' || userRole === 'non_parishioners' || userRole === 'secretary') {
                     tbody.append(`
                         <!-- Main Row -->
                         <tr class="toggle-row" data-index="${index + 1}" data-bs-toggle="collapse" 
@@ -718,17 +718,20 @@ function getActionButtons(item, userRole, userName) {
         if(item.assign_to_name === "N/A") {
             return `
             <p class="mb-0 d-flex justify-content-end">
-                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit( ${item.schedule_id})">Edit</a>
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
+                <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit( ${item.schedule_id})">Edit</a>
+                <a href="javascript:;" class="btn btn-sm btn-warning  me-5px" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
+                ${(userRole === 'parishioners' || userRole === 'non_parishioners' || userRole === 'secretary') ? `
+                <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
+            ` : ''}
             </p>
         `;
         } else if (item.created_by === <?= Auth::user()->id ?>){
             return `
             <p class="mb-0 d-flex justify-content-end">
-            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;
@@ -744,7 +747,7 @@ function getActionButtons(item, userRole, userName) {
         return `
             <p class="mb-0 d-flex justify-content-end">
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;
@@ -758,10 +761,10 @@ function getActionButtons(item, userRole, userName) {
         if (item.created_by === <?= Auth::user()->id ?>){
             return `
             <p class="mb-0 d-flex justify-content-end">
-            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;
@@ -778,10 +781,10 @@ function getActionButtons(item, userRole, userName) {
     if (item.created_by === <?= Auth::user()->id ?>){
             return `
             <p class="mb-0 d-flex justify-content-end">
-            <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
+            <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;
@@ -794,7 +797,7 @@ function getActionButtons(item, userRole, userName) {
             ` : `` } 
             
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-primary" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;

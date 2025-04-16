@@ -26,9 +26,9 @@
 
     <div class="panel panel-inverse">
         <div class="panel-heading" style="background: #fdfeff !important;">
-            <h4 class="panel-title" style="width: auto !important;">
+            <h4 class="panel-title" style="width: auto !important; padding: 10px 0px 0px 0px;">
                 <a href="{{ route('public_announce') }}" class="btn btn-primary btn-sm"
-                    style="display: inline !important;">Create announcement</a>
+                    style="display: inline  !important;">Create announcement</a>
                 <!-- <a href="{{ route('post_regular_sched') }}" class="btn btn-success btn-sm"
                     style="display: inline !important;">Post regular schedule</a> -->
             </h4>
@@ -275,10 +275,10 @@ $(document).ready(function() {
 
         if (data.status == 'is_pending') {
             html =
-                `@if(Auth::user()->role == 'secretary') <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_archive_class" data-id="${data.id}" aria-label="Decline">Decline</a>
+                `@if(Auth::user()->role == 'secretary') <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_decline_class" data-id="${data.id}" aria-label="Decline">Decline</a>
                                                 <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit">Edit</a>  @else <a href="javascript:;" class="btn btn-sm btn-success me-5px is_posted_class" data-id="${data.id}" aria-label="Post">Post</a>
-                                                <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_archive_class" data-id="${data.id}" aria-label="Decline">Decline</a>
-                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit">Edit</a> @endif `;
+                                                <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_decline_class" data-id="${data.id}" aria-label="Decline">Decline</a>
+                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-primary" aria-label="Edit">Edit</a> @endif `;
 
         } else if (data.status == 'is_posted') {
 
@@ -351,6 +351,7 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 location.href = "{{ route('anouncements') }}";
+                alert('Announcement posted successfully!');
             },
             error: function(xhr) {
                 console.log(xhr.responseText); // Debugging the error response
@@ -374,6 +375,7 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(response) {
+                alert('Announcement archived sucessfully!');
                 location.href = "{{ route('anouncements') }}";
             },
             error: function(xhr) {
@@ -383,6 +385,29 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.is_decline_class', function() {
+        var id = $(this).attr('data-id');
+        console.log(id);
+
+        $.ajax({
+            url: "{{ route('announcements.store') }}", // Ensure the correct route here
+            type: "POST",
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                tab_data: 'is_archive'
+            },
+            dataType: 'json',
+            success: function(response) {
+                alert('Announcement declined!');
+                location.href = "{{ route('anouncements') }}";
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText); // Debugging the error response
+                alert('Error saving the announcement');
+            }
+        });
+    });
 
 
 });

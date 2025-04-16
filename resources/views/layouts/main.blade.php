@@ -624,6 +624,31 @@
         const userId = $(this).data('userId');
         const formData = new FormData(this);
 
+        // Validate First Name
+        let firstName = $('#editFirstnameProfile').val();
+        if (!/^[a-zA-Z\s]+$/.test(firstName)) {
+            alert('First name cannot contain numbers or special characters.');
+            return;
+        }
+
+        // Validate Last Name
+        let lastName = $('#editLastnameProfile').val();
+        if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+            alert('Last name cannot contain numbers or special characters.');
+            return;
+        }
+        
+        let contactNumber = $('#editContactProfile').val();
+        console.log(contactNumber);
+        if (contactNumber.length !== 11) {
+            alert('Contact number must be exactly 11 digits.');
+            return;
+        }
+        if (!/^\d+$/.test(contactNumber)) {
+            alert('Contact number must contain only numbers.');
+            return;
+        }
+
         let email = $('#editEmailProfile').val();
         var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailPattern.test(email)) {

@@ -406,6 +406,8 @@ class ScheduleController extends Controller
         if ($sched_type === 'mass_sched') {
             
             $validated['purpose'] = 'Mass Schedule';
+            $validated['venue'] = 'St. Joseph the Worker Parish';
+            $validated['address'] = 'Tagbilaran City, Bohol';
             
         }
 
@@ -468,7 +470,7 @@ class ScheduleController extends Controller
         $schedule->save();
 
         return response()->json([
-            'message' => "Success Complete Schedule!"
+            'message' => "Schedule Completed!"
         ], 200);
 
     }
@@ -503,4 +505,20 @@ class ScheduleController extends Controller
 
     return response()->json(['status' => 1, 'message' => 'Request status updated successfully.']);
     }
+
+    public function approveSchedule(Request $request)
+{
+    try {
+        // Find the schedule by ID
+        $schedule = Schedule::findOrFail($request->input('sched_id'));
+
+        // Update the status to "Accepted by Parish Priest" (status = 2)
+        $schedule->status = $request->input('status', 2);
+        $schedule->save();
+
+        return response()->json(['message' => 'Schedule approved successfully.']);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
 }

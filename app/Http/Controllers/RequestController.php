@@ -45,7 +45,7 @@ class RequestController extends Controller
     
         $id_ = Auth::user()->id;
     
-        if (!in_array(Auth::user()->role, ['admin', 'parish_priest', 'secretary'])) {
+        if (!in_array(Auth::user()->role, ['admin', 'parish_priest'])) {
             $query->where(function ($q) use ($id_) {
                 $q->where('schedule_events_view_v2.created_by', $id_)
                   ->orWhere('schedule_events_view_v2.assign_to', $id_);
@@ -117,7 +117,7 @@ class RequestController extends Controller
 
         $id_ = Auth::user()->id;
     
-        if (!in_array(Auth::user()->role, ['admin', 'parish_priest', 'secretary'])) {
+        if (!in_array(Auth::user()->role, ['admin', 'parish_priest'])) {
             $query->where(function ($q) use ($id_) {
                 $q->where('schedule_events_view_v2.created_by', $id_)
                   ->orWhere('schedule_events_view_v2.assign_to', $id_);
