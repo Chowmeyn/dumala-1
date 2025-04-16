@@ -53,7 +53,8 @@
                     <i class="fas fa-circle fa-fw fs-9px text-success me-2"></i>
                     <span class="fc-event-text">Unassigned</span> -->
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked="">
+                        <input class="form-check-input" type="checkbox" value="N/A" id="flexCheckChecked" checked=""
+                        onclick="getEvents('')">
                         <label class="form-check-label" for="flexCheckChecked">
                             <b>Unassigned</b>
                         </label>
@@ -64,7 +65,7 @@
 
 
                     <div class="form-check mb-2">
-                        <input class="form-check-input flexCheckChecked" type="checkbox" value="{{Auth::user()->id}}" id="flexCheckChecked_{{Auth::user()->id}}" checked
+                        <input class="form-check-input flexCheckChecked" type="checkbox" value="{{Auth::user()->id}}" id="flexCheckChecked_{{Auth::user()->id}}" 
                             onclick="getEvents('{{Auth::user()->id}}')">
                         <label class="form-check-label" for="flexCheckChecked_{{Auth::user()->id}}">
                             <b>Own Schedule</b>
@@ -622,7 +623,7 @@ var Calendar = function() {
 $(document).ready(function() {
     Calendar.init();
 });
-let selectedIds = <?=(Auth::user()->role === 'admin') ? '[]' : '[' . Auth::user()->id . ']' ?>;
+let selectedIds = [];
 function getEvents(val='') {
     let ret = {};
 
@@ -639,6 +640,15 @@ function getEvents(val='') {
     } else {
         // Remove it from the array if it's unchecked
         selectedIds = selectedIds.filter(id => id !== val);
+    }
+
+    // Include "unassigned" schedules if the "Unassigned" checkbox is checked
+    if ($('#flexCheckChecked').prop('checked')) {
+        if (!selectedIds.includes('N/A')) {
+            selectedIds.push('N/A');
+        }
+    } else {
+        selectedIds = selectedIds.filter(id => id !== 'N/A');
     }
 
     // Log the selectedIds array to check if it updates correctly
@@ -690,10 +700,10 @@ function getEvents(val='') {
     return ret;
 }
 
-$('.flexCheckChecked').change(function() {
-        console.log("Checkbox changed, refreshing events...");
-        Calendar.init();
-    });
+$(document).on('change', '.form-check-input', function() {
+    console.log("Checkbox changed, refreshing events...");
+    Calendar.init(); // Call a function to refresh the calendar events
+});
 
 function completeSched(sched_id) {
     $('#event-details-modal').modal('hide');

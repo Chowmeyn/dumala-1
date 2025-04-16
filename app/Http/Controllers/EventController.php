@@ -83,20 +83,30 @@ class EventController extends Controller
                 'l.stipend AS liturgical_stipend'
             ]);
 
-        if (Auth::user()->role != "secretary") {
-            // Filter by selected IDs if provided
             if (!empty($selectedIds)) {
-                $events = $events->whereIn('s.assign_to', $selectedIds);
-            } else {
-                if (Auth::user()->role != "admin") {
-                    // Adjusted condition: checking for either `assign_to` being the authenticated user or `assign_to` being empty
-                    $events = $events->where(function ($query) {
-                        $query->where('s.assign_to', Auth::user()->id)
-                            ->orWhere('s.assign_to', ''); // Includes events where assign_to is empty
-                    });
-                }
-            }
-        }
+                $events = $events->where(function ($query) use ($selectedIds) {
+                    $query->whereIn('s.assign_to', $selectedIds)
+                          ->orWhere(function ($subQuery) use ($selectedIds) {
+                              if (in_array('N/A', $selectedIds)) {
+                                  $subQuery->whereNull('s.assign_to'); // Include unassigned schedules
+                              }
+                          });
+                });
+            } 
+        // if (Auth::user()->role != "secretary") {
+        //     // Filter by selected IDs if provided
+        //     if (!empty($selectedIds)) {
+        //         $events = $events->whereIn('s.assign_to', $selectedIds);
+        //     } else {
+        //         if (Auth::user()->role != "admin") {
+        //             // Adjusted condition: checking for either `assign_to` being the authenticated user or `assign_to` being empty
+        //             $events = $events->where(function ($query) {
+        //                 $query->where('s.assign_to', Auth::user()->id)
+        //                     ->orWhere('s.assign_to', ''); // Includes events where assign_to is empty
+        //             });
+        //         }
+        //     }
+        // }
 
 
 
