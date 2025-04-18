@@ -271,14 +271,14 @@ $(document).ready(function() {
     function getStatus(data) {
         var html = ``;
         
-        
-
         if (data.status == 'is_pending') {
             html =
-                `@if(Auth::user()->role == 'secretary') <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_decline_class" data-id="${data.id}" aria-label="Decline">Decline</a>
-                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit">Edit</a>  @else <a href="javascript:;" class="btn btn-sm btn-success me-5px is_posted_class" data-id="${data.id}" aria-label="Post">Post</a>
-                                                <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_decline_class" data-id="${data.id}" aria-label="Decline">Decline</a>
-                                                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-primary" aria-label="Edit">Edit</a> @endif `;
+            `@if(Auth::user()->role == 'secretary') <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success me-5px" aria-label="Edit">Edit</a> 
+                <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_cancel_class" data-id="${data.id}" aria-label="Cancel">Cancel</a> 
+            @else <a href="javascript:;" class="btn btn-sm btn-success me-5px is_posted_class" data-id="${data.id}" aria-label="Post">Post</a>
+                <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_decline_class" data-id="${data.id}" aria-label="Decline">Decline</a>
+                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-primary" aria-label="Edit">Edit</a> 
+            @endif `;
 
         } else if (data.status == 'is_posted') {
 
@@ -400,6 +400,30 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 alert('Announcement declined!');
+                location.href = "{{ route('anouncements') }}";
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText); // Debugging the error response
+                alert('Error saving the announcement');
+            }
+        });
+    });
+
+    $(document).on('click', '.is_cancel_class', function() {
+        var id = $(this).attr('data-id');
+        console.log(id);
+
+        $.ajax({
+            url: "{{ route('announcements.store') }}", // Ensure the correct route here
+            type: "POST",
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                tab_data: 'is_archive'
+            },
+            dataType: 'json',
+            success: function(response) {
+                alert('Announcement cancelled!');
                 location.href = "{{ route('anouncements') }}";
             },
             error: function(xhr) {

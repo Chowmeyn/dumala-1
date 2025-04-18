@@ -42,8 +42,8 @@
 
                 <div class="col-md-12 mt-3">
                     <div class="btn-group w-100">
-                        <a href="/liturgical-annual" class="btn btn-outline-success active">Annually</a>
-                        <a href="/liturgical-month" class="btn btn-outline-success">Monthly</a>
+                        <a href="/liturgical-annual" class="btn btn-outline-success">Annually</a>
+                        <a href="/liturgical-month" class="btn btn-outline-success active">Monthly</a>
                         <a href="/liturgical-week" class="btn btn-outline-success">Weekly</a>
                     </div>
                 </div>
@@ -195,7 +195,7 @@ function populateEditorWithData(data) {
 function getList(search = '', year = '', month = '', page = 1) {
     currentPage = page; // Update current page
     $.ajax({
-        url: '/list-request',
+        url: '/list-request-liturgical',
         method: 'GET',
         dataType: 'json',
         data: {
@@ -246,24 +246,34 @@ function getList(search = '', year = '', month = '', page = 1) {
                         <table class="table mb-2" style="border: none !important;">
                             <tbody>
                                 <tr>
-                                    <td style="border: none !important;"><strong>Requested Priest:</strong></td>
-                                    <td style="border: none !important;">${item.assign_to_name || 'N/A'}</td>
-                                    <td style="border: none !important;"><strong>Time:</strong></td>
-                                    <td style="border: none !important;">${item.time_from} - ${item.time_to}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td style="border: none !important;"><strong>Venue:</strong></td>
-                                    <td style="border: none !important;">${item.venue || 'N/A'}</td>
-                                    <td style="border: none !important;"><strong>Status:</strong></td>
-                                    <td style="border: none !important;">${item.status === 1 ? '<span class="badge bg-yellow text-black">Pending</span>' : '<span class="badge bg-success">Accepted by priest</span>'}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td style="border: none !important;"><strong>Address:</strong></td>
-                                    <td style="border: none !important;">${item.address || 'N/A'}</td>
-                                    
-                                </tr>
+                                                    <td style="border: none !important;"><strong>Requested Priest:</strong></td>
+                                                    <td style="border: none !important;">${item.assign_to_name || 'N/A'}</td>
+                                                    <td style="border: none !important;"><strong>Time:</strong></td>
+                                                    <td style="border: none !important;">${item.time_from} - ${item.time_to}</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td style="border: none !important;"><strong>Venue:</strong></td>
+                                                    <td style="border: none !important;">${item.venue || 'N/A'}</td>
+                                                    <td style="border: none !important;"><strong>Status:</strong></td>
+                                                    <td style="border: none !important;">${item.status === 1 
+                                                            ? '<span class="badge bg-yellow text-black">Pending</span>' 
+                                                            : item.status === 2 
+                                                                ? '<span class="badge bg-primary">Accepted</span>' 
+                                                                : item.status === 3 
+                                                                    ? '<span class="badge bg-danger">Declined</span>' 
+                                                                    : item.status === 4 
+                                                                        ? '<span class="badge bg-info text-black">Complete</span>' 
+                                                                        : item.status === 5 
+                                                                            ? '<span class="badge bg-secondary">Archived</span>' 
+                                                                            : '<span class="badge bg-success">Accepted by priest</span>' }</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td style="border: none !important;"><strong>Address:</strong></td>
+                                                    <td style="border: none !important;">${item.address || 'N/A'}</td>
+                                                    
+                                                </tr>
                             </tbody>
                         </table>
                         

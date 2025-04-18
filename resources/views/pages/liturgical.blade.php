@@ -263,7 +263,7 @@ function getList(search = '', page = 1) {
                                         </div>
                                         <div class="row mt-2">
                                             <div class="col-3" style="margin-left: 40px;">
-                                                 <strong>Stipend:</strong>
+                                                 <strong>Fee:</strong>
                                             </div>
                                             <div class="col-8 " style="padding-left: 30px;">
                                                  ${item.stipend}
@@ -304,7 +304,7 @@ function deleteLit(id) {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                alert("Liturgical deleted successfully!");
+                alert("Liturgical Service deleted successfully!");
                 location.reload();
             },
             error: function(xhr) {

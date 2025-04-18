@@ -87,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/schedules-store', [App\Http\Controllers\ScheduleController::class, 'storeOrUpdate'])->name('schedules.store');
     Route::post('/schedules/{id}/edit', [App\Http\Controllers\ScheduleController::class, 'edit'])->name('schedules.edit');
+    Route::post('/deleteSchedule', [App\Http\Controllers\ScheduleController::class, 'destroy'])->name('schedules.destroy');
 
     Route::post('/assign_priest', [App\Http\Controllers\ScheduleController::class, 'assign_priest'])->name('assign_priest');
     Route::post('/acceptRequest', [App\Http\Controllers\ScheduleController::class, 'acceptRequest'])->name('acceptRequest');
@@ -100,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/request/{id}/delete', [App\Http\Controllers\RequestController::class, 'deleteRequest'])->name('request.delete');
 
     Route::get('/list-request-complete', [App\Http\Controllers\RequestController::class, 'getListComplete'])->name('list-request-complete');
+    Route::get('/list-request-liturgical', [App\Http\Controllers\RequestController::class, 'getListCompletedLiturgical'])->name('list-request-liturgical');
 
     Route::get('/list-liturgical', [App\Http\Controllers\LiturgicalController::class, 'getListLiturgical'])->name('list-liturgical');
 

@@ -46,7 +46,7 @@
                     <div class="mb-3">
                         <label class="form-label" for="liturgicalName">Stipend:</label>
                         <input class="form-control w-25" name="stipend" type="number" id="stipend"
-                            placeholder="Enter Stipend" value="{{ $liturgical->stipend}}"/>
+                            placeholder="Enter Fee" value="{{ $liturgical->stipend}}"/>
                     </div>
 
                     <!-- Button container -->
@@ -121,14 +121,14 @@ $("#liturgicalForm").submit(function(e) {
     // liturgicalName, editor1, stipend
     var title = $('#liturgicalName').val()
     var requirements = $('.ck-editor__editable').html()
-    var stipend = $('#stipend').val()
+    var fee = $('#stipend').val()
     $.ajax({
         url: "/liturgicals/" + '{{ $liturgical->id}}',
         type: "POST",
         data: {
             title: title,
             requirements: requirements,
-            stipend: stipend,
+            fee: fee,
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -72,11 +72,13 @@
                     <div class="menu-caret"></div>
                 </a>
                 <div class="menu-submenu">
+                @if(Auth::user()->role === 'parish_priest')
                     <div class="menu-item" id="report_priest">
                         <a href="{{ route('report-annual') }}" class="menu-link">
                             <div class="menu-text">Priest Completed Services </i></div>
                         </a>
                     </div>
+                    @endif
                     <div class="menu-item" id="report_total">
                         <a href="{{ route('liturgical-annual') }}" class="menu-link">
                             <div class="menu-text">Total Liturgical Services Requested </i></div>

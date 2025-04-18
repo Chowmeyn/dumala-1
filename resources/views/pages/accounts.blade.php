@@ -429,8 +429,8 @@
                         </div>
 
                         <div class="modal-footer" style="border: 0px !important;">
-                            <button type="submit" class="btn btn-primary" style="margin-top: 15px !important;">Save
-                                Changes</button>
+                            <!-- <button type="submit" class="btn btn-primary" style="margin-top: 15px !important;">Save
+                                Changes</button> -->
                         </div>
                     </form>
                 </div>

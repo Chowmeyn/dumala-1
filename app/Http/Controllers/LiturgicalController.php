@@ -76,13 +76,18 @@ class LiturgicalController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string',
             'requirements' => 'required|string',
-            'stipend' => 'required|integer',
+            'fee' => 'numeric|min:0',
         ]);
 
-        $liturgical = Liturgical::create($request->all());
+        // Save the liturgical service
+        $liturgical = Liturgical::create([
+            'title' => $validatedData['title'],
+            'requirements' => $validatedData['requirements'],
+            'stipend' => $validatedData['fee'], // Save the stipend field
+        ]);
 
         return response()->json(['message' => 'Liturgical created successfully', 'data' => $liturgical], 201);
     }

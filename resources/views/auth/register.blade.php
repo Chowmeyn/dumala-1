@@ -7,7 +7,7 @@
     <div class="login-cover">
         <div class="login-cover-img" style="background-image: url({{ asset('assets/img/wallpaper.jpg') }})"
             data-id="login-cover-image"></div>
-        <div class="login-cover-bg"></div>
+        <div class="login-cover-bg" style="background-color: #244625; opacity: 0.9;" ></div>
     </div>
     <!-- END login-cover -->
 
@@ -24,6 +24,7 @@
             <div class="icon">
                 <i class="fa fa-lock"></i>
             </div> -->
+            <img class="card-img-top w-150px " src="{{ asset('assets/img/cathedral_logo.png') }}" alt="">
             <img class="card-img-top w-200px " src="{{ asset('assets/img/logos-dumala-trans.png') }}" alt="">
         </div>
         <!-- END login-header -->
@@ -124,10 +125,53 @@ $(document).ready(function() {
     $('#loginForm').on('submit', function(e) {
         e.preventDefault(); // Prevent default form submission
 
-        let password = $('#password').val();
+        let isValid = true;
+
+        // Get form values
+        let firstname = $('#firstname').val().trim();
+        let lastname = $('#lastname').val().trim();
+        let email = $('#email').val().trim();
+        let password = $('#password').val(); // Declare password only once
         let confirmPassword = $('#confirm-password').val();
 
+        // Clear previous error messages
+        $('.invalid-feedback').text('');
+        $('.form-control').removeClass('is-invalid');
 
+        // Validate first name (no numbers allowed)
+        if (!/^[a-zA-Z\s]+$/.test(firstname)) {
+            $('#firstname').addClass('is-invalid');
+            $('#firstnameError').text('First name should not contain numbers or special characters.');
+            isValid = false;
+        }
+
+        // Validate last name (no numbers allowed)
+        if (!/^[a-zA-Z\s]+$/.test(lastname)) {
+            $('#lastname').addClass('is-invalid');
+            $('#lastnameError').text('Last name should not contain numbers or special characters.');
+            isValid = false;
+        }
+
+        // Validate email (correct email format)
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            $('#email').addClass('is-invalid');
+            $('#emailError').text('Please enter a valid email address.');
+            isValid = false;
+        }
+
+        // Validate password and confirm password
+        if (password !== confirmPassword) {
+            $('#confirm-password').addClass('is-invalid');
+            $('#confirm-passwordError').text('Passwords do not match.');
+            isValid = false;
+        }
+
+        // If the form is not valid, stop submission
+        if (!isValid) {
+            return;
+        }
+
+        // Serialize form data
         let formData = $(this).serialize();
 
         $.ajax({

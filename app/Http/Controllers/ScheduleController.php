@@ -307,9 +307,22 @@ class ScheduleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $schedule = Schedule::find($request->sched_id);
+
+        if (!$schedule) {
+            return response()->json(['message' => 'Schedule not found.'], 404);
+        }
+
+        // Optional: Add authorization logic to ensure only the creator or admin can delete
+        if ($schedule->created_by !== auth()->user()->id && auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'You are not authorized to delete this schedule.'], 403);
+        }
+
+        $schedule->delete();
+
+        return response()->json(['message' => 'Schedule deleted successfully.']);
     }
 
     public function storeOrUpdate(Request $request)

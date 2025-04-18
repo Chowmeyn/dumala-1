@@ -42,7 +42,7 @@
             @if(Auth::user()->role === 'parishioners' || Auth::user()->role === 'non_parishioners' || Auth::user()->role
             === 'secretary')
             <a href="#modal-create-own-sched" data-bs-toggle="modal" class="btn btn-primary btn-sm me-1 mb-1">Create
-                schedule</a>
+                Request</a>
             @endif
             <div class="input-group mt-2">
                 <input type="text" id="search-input" class="form-control" placeholder="Search by Name or Role"
@@ -156,7 +156,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create schedule</h5>
+                <h5 class="modal-title">Create Request</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
             </div>
             <div class="modal-body">
@@ -718,7 +718,6 @@ function getActionButtons(item, userRole, userName) {
         if(item.assign_to_name === "N/A") {
             return `
             <p class="mb-0 d-flex justify-content-end">
-                <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit( ${item.schedule_id})">Edit</a>
                 <a href="javascript:;" class="btn btn-sm btn-warning  me-5px" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
                 ${(userRole === 'parishioners' || userRole === 'non_parishioners' || userRole === 'secretary') ? `
                 <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
@@ -879,7 +878,7 @@ function onclickDelete(schedId) {
         },
         success: function(response) {
             if (response.success) {
-                alert('Request canceled successfully.');
+                alert('Request cancelled successfully.');
                 getList(); // Refresh the list
             } else {
                 alert('Failed to cancel the request.');

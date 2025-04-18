@@ -277,7 +277,7 @@
                 <div class="mb-3">
                     <label class="form-label">Assign a priest:</label>
                     <select class="form-select" id="priest-select">
-                        <option value="" selected>Choose a priest</option>
+                        <!-- <option value="" selected>Choose a priest</option> -->
                         @foreach(get_all_priest() as $priest)
 
                         <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
@@ -555,22 +555,36 @@ var handleCalendarDemo = function() {
             $('#event-comment').text(info.event._def.extendedProps.others || "None");
             $('#event-priest-id').val(info.event._def.extendedProps.assign_to_id);
 
+            const authUserId = {{ Auth::user()->id }};
+            const authUserRole = "{{ Auth::user()->role }}";
+            const authUserName = " {{ Auth::user()->firstname }} {{ Auth::user()->lastname }}";
+            $('.modal-footer-detail').html('');
             if (info.event._def.extendedProps.status === 6) {
-                let buttonsHtml = `
-                    <button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button>
-                `;
+                // Clear the modal footer first
+                $('.modal-footer-detail').html('');
 
-                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest')
-                    buttonsHtml += `
+                // Show "Update" button only if the assigned ID matches the authenticated user ID
+                if (info.event._def.extendedProps.assign_to_id === authUserId && info.event._def.extendedProps.created_by === authUserName) {
+                    $('.modal-footer-detail').append(
+                        `
+                        <button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button>
+                        <button type="button" class="btn btn-danger px-4" onclick="deleteSched(${info.event._def.extendedProps.schedule_id})" id="delete-btn">Delete</button>
+                        `
+                    );
+                }
+
+                // Show "Approve" button only for admin or parish priest roles
+                if (authUserRole === 'admin' || authUserRole === 'parish_priest') {
+                    $('.modal-footer-detail').append(
+                        `
                         <button type="button" class="btn btn-primary px-4" id="approve-btn" onclick="approveSched(${info.event._def.extendedProps.schedule_id})">Approve</button>
-                    `;
-                @endif
-
-                $('.modal-footer-detail').html(buttonsHtml);
-            } if (info.event._def.extendedProps.status === 2){
+                        `
+                    );
+                }
+            } else if (info.event._def.extendedProps.status === 2){
                 
                 $('.modal-footer-detail').html(
-                    '@if( Auth::user()->role === 'admin' || Auth::user()->role === 'parish_priest')<button type="button" class="btn btn-success px-4" id="complete-btn" onclick="completeSched(' +
+                    '@if( Auth::user()->role === 'priest' || Auth::user()->role === 'parish_priest')<button type="button" class="btn btn-success px-4" id="complete-btn" onclick="completeSched(' +
                     info.event._def.extendedProps.schedule_id + ')">Mark as Complete</button>@endif'
                 );
                 
@@ -769,6 +783,29 @@ function archiveSched(sched_id) {
     });
 }
 // completeSched archiveSched
+
+function deleteSched(scheduleId) {
+    if (confirm('Are you sure you want to delete this schedule?')) {
+        $.ajax({
+            url: '/deleteSchedule', // Backend route to handle deletion
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token for security
+                sched_id: scheduleId, // Schedule ID to delete
+            },
+            success: function(response) {
+                alert('Schedule deleted successfully!');
+                $('#event-details-modal').modal('hide'); // Close the modal
+                setTimeout(() => {
+                    location.reload(); // Reload the page to reflect changes
+                }, 2000);
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON.message || 'An error occurred while deleting the schedule.');
+            }
+        });
+    }
+}
 
 $("#datepicker-disabled-past").datepicker({
     todayHighlight: true
