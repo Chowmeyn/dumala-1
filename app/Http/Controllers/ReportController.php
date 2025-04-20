@@ -129,8 +129,18 @@ class ReportController extends Controller
      */
     public function updateMarriage(Request $request, $id)
     {
-        $marriage = Marriage::findOrFail($id);
-    
+        $announcement = Announcement::findOrFail($id);
+        
+        // Get the associated marriage record
+        $marriage = Marriage::where('parent', $announcement->parent)
+            ->where('announcement_type', $announcement->announcement_type)
+            ->first();
+            
+        if (!$marriage) {
+            return response()->json(['error' => 'Marriage record not found'], 404);
+        }
+        
+        // Update the marriage record
         $marriage->update([
             'announcement_type' => $request->announcement_type,
             'marriage_bann' => $request->marriage_bann,
@@ -142,23 +152,17 @@ class ReportController extends Controller
             'bride_address' => $request->bride_address,
             'groom_parents' => $request->groom_parents,
             'bride_parents' => $request->bride_parents,
-            'status' => $request->status, // Allow status update
+            'status' => $request->status,
+        ]);
+        
+        // Update the announcement
+        $announcement->update([
+            'title' => $request->marriage_bann,
+            'content' => $this->generateMarriageContent($request),
+            'status' => $request->status,
         ]);
     
-        // Update related Announcement
-        $announcement = Announcement::where('parent', $marriage->parent)
-            ->where('announcement_type', $request->announcement_type)
-            ->first();
-    
-        if ($announcement) {
-            $announcement->update([
-                'title' => $request->marriage_bann,
-                'content' => $this->generateMarriageContent($request),
-                'status' => $request->status,
-            ]);
-        }
-    
-        return response()->json(['success' => 'Announcement updated '.$marriage->parent.' - '.$request->announcement_type.' successfully!', 'marriage' => $marriage]);
+        return response()->json(['success' => 'Announcement updated successfully!', 'marriage' => $marriage]);
     }
     
     /**
@@ -232,8 +236,18 @@ class ReportController extends Controller
 
     public function editMarriage($id)
     {
-        $announcement = Marriage::findOrFail($id);
-        return view('pages.create_announcement.marriage_edit', compact('announcement'));
+        $announcement = Announcement::findOrFail($id);
+        
+        // Get the associated marriage record
+        $marriage = Marriage::where('parent', $announcement->parent)
+            ->where('announcement_type', $announcement->announcement_type)
+            ->first();
+            
+        if (!$marriage) {
+            return redirect()->route('anouncements')->with('error', 'Marriage record not found');
+        }
+        
+        return view('pages.create_announcement.marriage_edit', compact('announcement', 'marriage'));
     }
 
 
@@ -320,3 +334,4 @@ class ReportController extends Controller
         return response()->json(['message' => 'Announcement updated successfully!']);
     }
 }
+

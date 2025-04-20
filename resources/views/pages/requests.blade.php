@@ -576,6 +576,10 @@ function getList(search = '', page = 1) {
                                                         <td><strong>Address:</strong></td>
                                                         <td>${item.address || 'N/A'}</td>
                                                     </tr>
+                                                    <tr>
+                                                        <td><strong>${item.purpose} Requirements:</strong></td>
+                                                        <td colspan="3">${item.purpose_requirements || 'None'}</td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                             ${getActionButtons(item, userRole, userName)}
@@ -672,6 +676,10 @@ function getList(search = '', page = 1) {
                                                     <tr>
                                                         <td><strong>Address:</strong></td>
                                                         <td>${item.address || 'N/A'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>${item.purpose} Requirements:</strong></td>
+                                                        <td colspan="3">${item.purpose_requirements || 'None'}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -773,6 +781,14 @@ function getActionButtons(item, userRole, userName) {
             ${(userRole === 'parishioners' || userRole === 'non_parishioners') ? `` : `<a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickAccept(${item.schedule_id},6)">Accept</a>` } 
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
            
+        </p>
+        `;
+        } else {
+            return `
+            <p class="mb-0 d-flex justify-content-end">
+            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+            ` : ''}
         </p>
         `;
         }

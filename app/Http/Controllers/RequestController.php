@@ -36,11 +36,13 @@ class RequestController extends Controller
     
         $query = DB::table('schedule_events_view_v2')
         ->leftJoin('declined_requests', 'schedule_events_view_v2.schedule_id', '=', 'declined_requests.schedule_id')
+        ->leftJoin('liturgicals', 'schedule_events_view_v2.purpose', '=', 'liturgicals.title') // Join with liturgicals table
         ->select(
             'schedule_events_view_v2.*',
             'declined_requests.reason as declined_reason',
-            'declined_requests.referred_priest_id as declined_priest_id', // Fix here
-            'declined_requests.created_at as declined_at'
+            'declined_requests.referred_priest_id as declined_priest_id',
+            'declined_requests.created_at as declined_at',
+            'liturgicals.requirements as purpose_requirements' // Fetch requirements from liturgicals table
         );
     
         $id_ = Auth::user()->id;

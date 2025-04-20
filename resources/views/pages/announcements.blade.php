@@ -45,7 +45,7 @@
                                 <option value="public">Public announcement</option>
                                 <option value="marriage">Marriage banns</option>
                                 <option value="project">Project and financial</option>
-                                <option value="mass">Mass schedules</option>
+                                <!-- <option value="mass">Mass schedules</option> -->
                             </select>
                         </div>
                     </div>
@@ -273,18 +273,18 @@ $(document).ready(function() {
         
         if (data.status == 'is_pending') {
             html =
-            `@if(Auth::user()->role == 'secretary') <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success me-5px" aria-label="Edit">Edit</a> 
+            `@if(Auth::user()->role == 'secretary') <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.id}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success me-5px" aria-label="Edit">Edit</a> 
                 <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_cancel_class" data-id="${data.id}" aria-label="Cancel">Cancel</a> 
             @else <a href="javascript:;" class="btn btn-sm btn-success me-5px is_posted_class" data-id="${data.id}" aria-label="Post">Post</a>
                 <a href="javascript:;" class="btn btn-sm btn-danger me-5px is_decline_class" data-id="${data.id}" aria-label="Decline">Decline</a>
-                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-primary" aria-label="Edit">Edit</a> 
+                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.id}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-primary" aria-label="Edit">Edit</a> 
             @endif `;
 
         } else if (data.status == 'is_posted') {
 
             html =
                 `
-                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.parent}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit" >Edit</a>
+                <a href="${data.announcement_type == 'marriage' ? `/marriage/${data.id}/edit`: data.announcement_type == 'project' ? `/project_financial/${data.id}/edit` : data.announcement_type == 'public' ? `/public_announce/${data.id}/edit`: "javascript:;" }" class="btn btn-sm btn-success" aria-label="Edit" >Edit</a>
                 
                 <a href="javascript:;" class="btn btn-sm btn-danger is_archive_class" data-id="${data.id}" style="margin-left: 10px !important" aria-label="Archive">Archive</a> `;
         } else {

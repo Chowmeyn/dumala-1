@@ -36,7 +36,7 @@
                                 <option value="public">Public announcement</option>
                                 <option value="marriage" selected>Marriage banns</option>
                                 <option value="project">Project and financial</option>
-                                <option value="mass">Mass schedules</option>
+                                <!-- <option value="mass">Mass schedules</option> -->
                             </select>
                         </div>
                     </div>
@@ -146,15 +146,37 @@ $(document).ready(function() {
         }
     });
 
+    // Define the required fields for marriage banns
+    const requiredFields = [
+        'announcement_type',
+        'marriage_bann',
+        'groom_name',
+        'bride_name',
+        'groom_age',
+        'bride_age',
+        'groom_address',
+        'bride_address',
+        'groom_parents',
+        'bride_parents'
+    ];
+
     // Validate input fields
     function validateInput(input) {
         const $input = $(input);
+        const value = $input.val().trim();
+        const fieldName = $input.attr('name');
         
-        if ($input.prop('required') && $input.val().trim() === "") {
+        console.log(`Validating ${fieldName}: "${value}"`);
+        
+        if ($input.prop('required') && value === "") {
             $input.addClass('is-invalid');
+            if (!$input.next('.error').length) {
+                $input.after('<div class="error" style="height: 20px;">This field is required</div>');
+            }
             return false;
         } else {
             $input.removeClass('is-invalid');
+            $input.next('.error').remove();
             return true;
         }
     }
@@ -169,36 +191,60 @@ $(document).ready(function() {
         e.preventDefault();
 
         let isValid = true;
+        const invalidFields = [];
 
-        // Validate all input fields
-        $('input, select').each(function() {
-            if (!validateInput(this)) {
+        // Only validate the fields we know should be in the form
+        requiredFields.forEach(fieldName => {
+            const $field = $(`[name="${fieldName}"]`);
+            if ($field.length && !validateInput($field)) {
                 isValid = false;
+                invalidFields.push(fieldName);
             }
         });
 
-        console.log('Form Valid:', isValid);
+        console.log('Form validation result:', {
+            isValid: isValid,
+            invalidFields: invalidFields
+        });
 
         if (isValid) {
+            const formData = $('#announcement-form').serialize();
+            console.log('Submitting form data:', formData);
+
             $.ajax({
                 url: "{{ route('marriage.store') }}",
                 type: "POST",
-                data: $('#announcement-form').serialize(),
+                data: formData,
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                success: function() {
-                    alert('Announcement created successfully!');
-                    location.href = "{{ route('anouncements') }}";
+                success: function(response) {
+                    message({
+                        title: 'Success!',
+                        message: 'Announcement created successfully!',
+                        icon: 'success'
+                    });
+                    setTimeout(() => {
+                        location.href = "{{ route('anouncements') }}";
+                    }, 1500);
                 },
-                error: function() {
-                    alert('Error saving the announcement');
+                error: function(xhr) {
+                    message({
+                        title: 'Error!',
+                        message: 'Error saving the announcement',
+                        icon: 'error'
+                    });
+                    console.error('Error:', xhr.responseText);
                 }
+            });
+        } else {
+            message({
+                title: 'Validation Error!',
+                message: 'Please fill in the following required fields: ',
+                icon: 'error'
             });
         }
     });
 });
-
 </script>
-
 @endpush

@@ -27,7 +27,7 @@
                             <option value="public" selected>Public announcement</option>
                             <option value="marriage">Marriage banns</option>
                             <option value="project">Project and financial</option>
-                            <option value="mass">Mass schedules</option>
+                            <!-- <option value="mass">Mass schedules</option> -->
                         </select>
                     </div>
                 </div>
@@ -87,73 +87,50 @@ $('#announcement-form').on('submit', function(e) {
     var isValid = true;
 
     var title = $('#title').val().trim();
-    var content = $('.content_text').val();
+    var content = window.editor ? window.editor.getData().trim() : ''; // Get content from CKEditor
     var announcementType = $('#announcement_type').val();
 
     if (title == '') {
         validateInput('#title');
         message({
-                    title: 'Error!',
-                    message: "Title should not be empty!",
-                    icon: 'error'
-                });
-        if ($('#title').hasClass('is-invalid')) {
-            isValid = false; // If any input is invalid, set isValid to false
-
-        }
+            title: 'Error!',
+            message: "Title should not be empty!",
+            icon: 'error'
+        });
+        isValid = false;
     } else if (content == '') {
-        validateInput('.content_text');
         message({
-                    title: 'Error!',
-                    message: "Content should not be empty!",
-                    icon: 'error'
-                });
-        if ($('.content_text').hasClass('is-invalid')) {
-            isValid = false; // If any input is invalid, set isValid to false
-
-        }
+            title: 'Error!',
+            message: "Content should not be empty!",
+            icon: 'error'
+        });
+        isValid = false;
     } else if (announcementType == '') {
         validateInput('#announcement_type');
         message({
-                    title: 'Error!',
-                    message: "Announcement type",
-                    icon: 'error'
-                });
-        if ($('#announcement_type').hasClass('is-invalid')) {
-            isValid = false; // If any input is invalid, set isValid to false
-
-        }
+            title: 'Error!',
+            message: "Announcement type should not be empty!",
+            icon: 'error'
+        });
+        isValid = false;
     }
 
-    // message({
-    //                 title: 'Success!',
-    //                 message: response.message,
-    //                 icon: 'success'
-    //             });
-
-    //             setTimeout(() => {
-    //                 location.reload();
-    //             }, 2000);
-
     if (isValid) {
-
         // AJAX request to save the announcement
         $.ajax({
-            url: "{{ route('save_announcement') }}", // Adjust this route according to your Laravel routes
+            url: "{{ route('save_announcement') }}", 
             type: 'POST',
             data: {
                 title: title,
                 content: content,
                 announcement_type: announcementType,
-                _token: '{{ csrf_token() }}' // CSRF token for security
+                _token: '{{ csrf_token() }}'
             },
             success: function(response) {
-
                 alert('Announcement saved successfully!');
                 location.href = "{{ route('anouncements') }}";
             },
             error: function(xhr) {
-                // Handle error response
                 alert('An error occurred while saving the announcement.');
                 console.error('Error response:', xhr.responseText);
                 console.error('Status:', xhr.status);
@@ -208,11 +185,12 @@ var handleCkeditor = function() {
                 'code',
                 'undo',
                 'redo',
-                'bulletedList',   // Add this for bulleted list
-                'numberedList'    // Add this for numbered list
-                // The unwanted features (Link, BlockQuote, Insert Table, Image Upload) are omitted here
+                'bulletedList',   
+                'numberedList'    
             ]
         }
+    }).then(editor => {
+        window.editor = editor; // Store editor instance globally
     }).catch(error => {
         console.error(error);
     });

@@ -35,7 +35,7 @@
                             <option value="public">Public announcement</option>
                             <option value="marriage">Marriage banns</option>
                             <option value="project" selected>Project and financial</option>
-                            <option value="mass">Mass schedules</option>
+                            <!-- <option value="mass">Mass schedules</option> -->
                         </select>
                     </div>
                 </div>

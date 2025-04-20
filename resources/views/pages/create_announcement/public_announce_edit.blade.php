@@ -29,9 +29,9 @@
                         <label class="form-label">Announcement type:</label>
                         <select class="form-select" id="announcement_type" name="announcement_type">
                             <option value="public" {{ $announcement->announcement_type == 'public' ? 'selected' : '' }}>Public announcement</option>
-                            <option value="marriage" {{ $announcement->announcement_type == 'marriage' ? 'selected' : '' }}>Marriage banns</option>
+                            <!-- <option value="marriage" {{ $announcement->announcement_type == 'marriage' ? 'selected' : '' }}>Marriage banns</option>
                             <option value="project" {{ $announcement->announcement_type == 'project' ? 'selected' : '' }}>Project and financial</option>
-                            <option value="mass" {{ $announcement->announcement_type == 'mass' ? 'selected' : '' }}>Mass schedules</option>
+                            <option value="mass" {{ $announcement->announcement_type == 'mass' ? 'selected' : '' }}>Mass schedules</option> -->
                         </select>
                     </div>
                 </div>

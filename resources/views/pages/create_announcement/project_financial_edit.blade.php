@@ -17,10 +17,10 @@
                 <div class="col-md-6">
                     <label class="form-label">Announcement type:</label>
                     <select class="form-select" id="announcement_type">
-                        <option value="public" {{ $announcement->announcement_type == 'public' ? 'selected' : '' }}>Public announcement</option>
-                        <option value="marriage" {{ $announcement->announcement_type == 'marriage' ? 'selected' : '' }}>Marriage banns</option>
+                        <!-- <option value="public" {{ $announcement->announcement_type == 'public' ? 'selected' : '' }}>Public announcement</option> -->
+                        <!-- <option value="marriage" {{ $announcement->announcement_type == 'marriage' ? 'selected' : '' }}>Marriage banns</option> -->
                         <option value="project" {{ $announcement->announcement_type == 'project' ? 'selected' : '' }}>Project and financial</option>
-                        <option value="mass" {{ $announcement->announcement_type == 'mass' ? 'selected' : '' }}>Mass schedules</option>
+                        <!-- <option value="mass" {{ $announcement->announcement_type == 'mass' ? 'selected' : '' }}>Mass schedules</option> -->
                     </select>
                 </div>
             </div>
@@ -67,7 +67,7 @@
 
             <div class="pagination pagination-sm d-flex justify-content-end mt-3">
                 <p class="mb-0 d-flex justify-content-end">
-                    <a href="javascript:;" id="update-announcement-btn" class="btn btn-sm btn-success me-5px">Update</a>
+                    <a href="javascript:;" id="update-announcement-btn" class="btn btn-sm btn-success me-5px">Update Announcement</a>
                     <a href="/announcements" class="btn btn-sm btn-danger me-5px">Cancel</a>
                 </p>
             </div>
