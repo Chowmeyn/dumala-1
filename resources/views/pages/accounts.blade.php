@@ -290,8 +290,8 @@
                                                 <option value="parish_priest">Parish priest</option>
                                                 <option value="secretary">Secretary</option>
                                                 <option value="priest">Priest</option>
-                                                <option value="parishioners">Parishioners</option>
-                                                <option value="non_parishioners">Non-parishioners</option>
+                                                <!-- <option value="parishioners">Parishioners</option>
+                                                <option value="non_parishioners">Non-parishioners</option> -->
                                             </select>
                                             <label for="role" class="d-flex align-items-center fs-13px">User
                                                 Role</label>
@@ -763,7 +763,10 @@ function getList(search, url = '/user-list') {
                             <td width="1%" class="with-img">${profileImage}</td>
                             <td>${user.prefix ? user.prefix+'.': ''} ${user.firstname} ${user.lastname}</td>
                             <td>${displayRole}</td>
-                            <td>${statusSwitch}</td>
+                            ${role !== 'non_parishioners' && role !== 'parishioners' ? 
+                                `<td>${statusSwitch}</td>` 
+                                : '<td style="width: 1%"></td>'
+                            }
                             <td style="text-align: right; padding-right: 50px">
                                 <a href="#" class="text-body text-opacity-50" onclick="openEditModal(${user.id})">
                                     <i class="fa fa-ellipsis-h fs-30px"></i>

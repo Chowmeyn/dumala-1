@@ -293,6 +293,45 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal-dialog-assign-to-priest">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Assign a priest</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
+            </div>
+            <div class="modal-body">
+                <div class="widget-list rounded mb-4" data-id="widget">
+                    <!-- BEGIN widget-list-item -->
+
+                    @foreach(get_all_priest() as $priest)
+                    <div class="widget-list-item">
+                        <div class="widget-list-media">
+                            <img src="{{ $priest->profile_image ?? '/assets/img/user/user-profile-icon.jpg'}}"
+                                width="50" alt="" class="rounded">
+                        </div>
+                        <div class="widget-list-content">
+                            <h4 class="widget-list-title">{{ $priest->prefix ? $priest->prefix.'.' : '' }}
+                                {{ $priest->firstname }} {{ $priest->lastname }}</h4>
+                        </div>
+                        <div class="widget-list-action">
+                            <a href="javascript:;" data-id="" onclick="onclickAssignPost({{ $priest->id }})"
+                                class="btn btn-success btn-icon btn-circle btn-lg assign_post">
+                                <i class="fa fa-add"> </i>
+                            </a>
+                        </div>
+                    </div>
+                    @endforeach
+
+                    <!-- END widget-list-item -->
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
 <!-- END row -->
 @endsection
 
@@ -563,21 +602,21 @@ var handleCalendarDemo = function() {
                 // Clear the modal footer first
                 $('.modal-footer-detail').html('');
 
+                // Show "Approve" button only for admin or parish priest roles
+                if (authUserRole === 'admin' || authUserRole === 'parish_priest') {
+                    $('.modal-footer-detail').append(
+                        `
+                        <button type="button" class="btn btn-primary px-4" id="approve-btn" onclick="approveSched(${info.event._def.extendedProps.schedule_id})">Approve</button>
+                        `
+                    );
+                }
+                                
                 // Show "Update" button only if the assigned ID matches the authenticated user ID
                 if (info.event._def.extendedProps.assign_to_id === authUserId && info.event._def.extendedProps.created_by === authUserName) {
                     $('.modal-footer-detail').append(
                         `
                         <button type="button" class="btn btn-success px-4" onclick="UpdateBTN()" id="update-btn">Update</button>
                         <button type="button" class="btn btn-danger px-4" onclick="deleteSched(${info.event._def.extendedProps.schedule_id})" id="delete-btn">Delete</button>
-                        `
-                    );
-                }
-
-                // Show "Approve" button only for admin or parish priest roles
-                if (authUserRole === 'admin' || authUserRole === 'parish_priest') {
-                    $('.modal-footer-detail').append(
-                        `
-                        <button type="button" class="btn btn-primary px-4" id="approve-btn" onclick="approveSched(${info.event._def.extendedProps.schedule_id})">Approve</button>
                         `
                     );
                 }
@@ -588,6 +627,21 @@ var handleCalendarDemo = function() {
                     info.event._def.extendedProps.schedule_id + ')">Mark as Complete</button>@endif'
                 );
                 
+            } else if (info.event._def.extendedProps.status === 1){
+                if (info.event._def.extendedProps.assign_to === 'N/A') {
+                $('.modal-footer-detail').html(
+                    '@if( Auth::user()->role === "parish_priest")<button type="button" class="btn btn-primary px-4" id="complete-btn" onclick="onclickAssignToPriest(' +
+                    info.event._def.extendedProps.schedule_id + ')">Assign a Priest</button>@endif'
+                );
+                }
+                // } else if (info.event._def.extendedProps.assign_to_id === {{ Auth::user()->id }}){
+                //     $('.modal-footer-detail').html(
+                //         `
+                //         <button type="button" class="btn btn-sm btn-success px-4" onclick="onclickAccept(${info.event._def.extendedProps.schedule_id})">Accept</button>
+                //         <button type="button" class="btn btn-sm btn-danger px-4 btn_decline" onclick="onclickDecline(${info.event._def.extendedProps.schedule_id})">Decline</button>
+                //         `
+                //     )
+                // }
             }
 
 
@@ -751,6 +805,56 @@ function completeSched(sched_id) {
 
         }
     });
+}
+
+function onclickAssignToPriest(id) {
+
+$('#modal-dialog-assign-to-priest').modal('show');
+$('.assign_post').attr('data-id', id);
+
+}
+
+function onclickAssignPost(id) {
+    console.log(id);
+
+
+    $.ajax({
+        url: `/assign_priest`,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            user_id: id,
+            sched_id: $('.assign_post').attr('data-id'),
+            status: 1,
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+
+            if (response.status == 1) {
+                $('#modal-dialog-assign-to-priest').modal('hide');
+                message({
+                    title: 'Success!',
+                    message: response.message,
+                    icon: 'success'
+                });
+                getList();
+            } else {
+                message({
+                    title: 'Error!',
+                    message: response.message,
+                    icon: 'error'
+                });
+            }
+
+        },
+        error: function(xhr, status, error) {
+            console.error('Error updating user:', error);
+        }
+    });
+
+
 }
 
 function archiveSched(sched_id) {

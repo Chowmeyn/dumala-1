@@ -657,11 +657,11 @@ $(document).ready(function() {
                         let content1 = item.content.replace(/<\/?[^>]+(>|$)/g, "");
                         console.log(content1);
                         let content = item.content;
-                        let maxLength = 100;
+                        let maxLength = 150;
                         let displayContent = content1.length > maxLength ?
                             content1.substring(0, maxLength) +
                             ' .. <a href="#" class="show-modal" data-date_format="' +
-                            formatDate(item.created_at) + '" data-content="' +
+                            formatDate(item.updated_at) + '" data-content="' +
                             encodeURIComponent(content) + '" data-title="' +
                             encodeURIComponent(
                                 item.title) + '">View more...</a>' :
@@ -671,7 +671,7 @@ $(document).ready(function() {
                             <div class="d-flex m">
                                 <div class="border-end text-center d-flex align-items-center justify-content-center"
                                     style="width: 200px !important; height: 100px;">
-                                    <div class="mb-3px">${formatDate(item.created_at)}</div>
+                                    <div class="mb-3px">${formatDate(item.updated_at)}</div>
                                 </div>
                                 <div class="flex-1 ps-3 pt-3">
                                     <h5>${item.title}</h5>

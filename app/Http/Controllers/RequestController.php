@@ -43,7 +43,8 @@ class RequestController extends Controller
             'declined_requests.referred_priest_id as declined_priest_id',
             'declined_requests.created_at as declined_at',
             'liturgicals.requirements as purpose_requirements' // Fetch requirements from liturgicals table
-        );
+        )
+        ->where('schedule_events_view_v2.status', '!=', 4);
     
         $id_ = Auth::user()->id;
     
