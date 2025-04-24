@@ -710,7 +710,7 @@ function getList(search = '', page = 1) {
 function getStatusBadge(status,role) {
     const statuses = {
         1: '<span class="badge bg-yellow text-black">Pending</span>',
-        2: '<span class="badge bg-primary">Accepted by Parish priest</span>',
+        2: '<span class="badge bg-primary">Approved by Parish priest</span>',
         3: '<span class="badge bg-danger">Referred to another priest</span>',
         4: '<span class="badge bg-info text-black">Complete</span>',
         5: '<span class="badge bg-secondary">Archived</span>',
@@ -726,8 +726,11 @@ function getActionButtons(item, userRole, userName) {
         if(item.assign_to_name === "N/A") {
             return `
             <p class="mb-0 d-flex justify-content-end">
-                <a href="javascript:;" class="btn btn-sm btn-warning  me-5px" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
+                ${(userRole === 'parish_priest') ? `
+                    <a href="javascript:;" class="btn btn-sm btn-warning  me-5px" onclick="onclickAssignToPriest(${item.schedule_id})">Assign a priest</a>
+                ` : ''}
                 ${(userRole === 'parishioners' || userRole === 'non_parishioners' || userRole === 'secretary') ? `
+                <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
                 <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
             ` : ''}
             </p>
@@ -798,6 +801,9 @@ function getActionButtons(item, userRole, userName) {
             <p class="mb-0 d-flex justify-content-end">
             <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
+            ${(userRole === 'admin' || userRole === 'parish_priest') ? `
+                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove(${item.schedule_id},2)">Approve</a>
+            ` : ''}
             ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
