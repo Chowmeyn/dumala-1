@@ -113,7 +113,7 @@
                     <li class="nav-item">
                         <a href="#nav-pills-tab-3" data-bs-toggle="tab" data-val="marriage" id="marriage-tab"
                             class="nav-link">
-                            <span class="d-sm-block d-none"><strong>Marriage Bans</strong></span>
+                            <span class="d-sm-block d-none"><strong>Marriage Banns</strong></span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -221,7 +221,7 @@
             <div class="modal-body">
                 <input type="hidden" id="sched_ids">
                 <input type="hidden" id="event-priest-id">
-                <p><strong>Status:</strong> <span id="event-status"></span></p>
+                <!-- <p><strong>Status:</strong> <span id="event-status"></span></p> -->
                 <p><strong>Date:</strong> <span id="event-date"></span></p>
                 <p><strong>Time:</strong> <span id="event-time"></span></p>
                 <p><strong>Purpose:</strong> <span id="event-purpose"></span></p>

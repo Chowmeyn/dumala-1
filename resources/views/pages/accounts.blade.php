@@ -763,7 +763,7 @@ function getList(search, url = '/user-list') {
                             <td width="1%" class="with-img">${profileImage}</td>
                             <td>${user.prefix ? user.prefix+'.': ''} ${user.firstname} ${user.lastname}</td>
                             <td>${displayRole}</td>
-                            ${role !== 'non_parishioners' && role !== 'parishioners' ? 
+                            ${role !== 'non_parishioners' && role !== 'parishioners' && role !== 'secretary' ? 
                                 `<td>${statusSwitch}</td>` 
                                 : '<td style="width: 1%"></td>'
                             }

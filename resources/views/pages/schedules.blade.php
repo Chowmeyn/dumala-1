@@ -332,6 +332,42 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal-dialog-decline">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Decline Request</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
+            </div>
+            <form id="decline-form">
+                <div class="modal-body">
+                    <input type="hidden" id="schedule_id" name="schedule_id"> <!-- Hidden input for schedule ID -->
+
+                    <div class="mb-3">
+                        <label class="form-label">Refer Another Priest:</label>
+                        <select class="form-select" id="priest-select" name="priest_id">
+                            <option value="" selected>Choose a priest</option>
+                            @foreach(get_all_priest() as $priest)
+                            <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Add a reason:</label>
+                        <textarea id="editor-text" name="reason" class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a href="javascript:;" class="btn btn-white" data-bs-dismiss="modal">Close</a>
+                    <button type="submit" class="btn btn-danger">Decline</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- END row -->
 @endsection
 
@@ -572,7 +608,7 @@ var handleCalendarDemo = function() {
             } else if (status === 2) {
                 statusBadge = '<span class="badge bg-primary">Accepted by Parish Priest</span>';
             } else if (status === 3) {
-                statusBadge = '<span class="badge bg-danger">Declined</span>';
+                statusBadge = '<span class="badge bg-danger">Referred to another priest</span>';
             } else if (status === 4) {
                 statusBadge = '<span class="badge bg-info text-black">Complete</span>';
             } else if (status === 5) {
@@ -633,15 +669,23 @@ var handleCalendarDemo = function() {
                     '@if( Auth::user()->role === "parish_priest")<button type="button" class="btn btn-primary px-4" id="complete-btn" onclick="onclickAssignToPriest(' +
                     info.event._def.extendedProps.schedule_id + ')">Assign a Priest</button>@endif'
                 );
+                } else if (info.event._def.extendedProps.assign_to_id === {{ Auth::user()->id }}){
+                    $('.modal-footer-detail').html(
+                        `
+                        <button type="button" class="btn btn-sm btn-success px-4" onclick="onclickAccept(${info.event._def.extendedProps.schedule_id}, 6)">Accept</button>
+                        <button type="button" class="btn btn-sm btn-danger px-4 btn_decline" onclick="onclickDecline(${info.event._def.extendedProps.schedule_id})">Decline</button>
+                        `
+                    )
                 }
-                // } else if (info.event._def.extendedProps.assign_to_id === {{ Auth::user()->id }}){
-                //     $('.modal-footer-detail').html(
-                //         `
-                //         <button type="button" class="btn btn-sm btn-success px-4" onclick="onclickAccept(${info.event._def.extendedProps.schedule_id})">Accept</button>
-                //         <button type="button" class="btn btn-sm btn-danger px-4 btn_decline" onclick="onclickDecline(${info.event._def.extendedProps.schedule_id})">Decline</button>
-                //         `
-                //     )
-                // }
+            } else if (info.event._def.extendedProps.status === 3){
+                if (info.event._def.extendedProps.assign_to_id === {{ Auth::user()->id }}){
+                    $('.modal-footer-detail').html(
+                        `
+                        <button type="button" class="btn btn-sm btn-success px-4" onclick="onclickAccept(${info.event._def.extendedProps.schedule_id}, 6)">Accept</button>
+                        <button type="button" class="btn btn-sm btn-danger px-4 btn_decline" onclick="onclickDecline(${info.event._def.extendedProps.schedule_id})">Decline</button>
+                        `
+                    )
+                }
             }
 
 
@@ -888,6 +932,65 @@ function archiveSched(sched_id) {
 }
 // completeSched archiveSched
 
+function onclickAccept(sched_id,status=9) {
+
+$.ajax({
+    url: `/acceptRequest`,
+    method: 'POST',
+    dataType: 'json',
+    data: {
+        sched_id: sched_id,
+        status: status,
+    },
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    success: function(response) {
+        if (response.status == 1) {
+            $('#modal-dialog-assign-to-priest').modal('hide');
+            message({
+                title: 'Success!',
+                message: response.message,
+                icon: 'success'
+            });
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            message({
+                title: 'Error!',
+                message: response.message,
+                icon: 'error'
+            });
+        }
+    },
+    error: function(xhr, status, error) {
+        console.error('Error updating user:', error);
+    }
+});
+}
+
+function clearEditorContent() {
+    if (window.editor) {
+        window.editor.setData(''); // Clears the editor content
+    }
+}
+
+function onclickDecline(id) {
+
+console.log(id);
+
+
+$('#modal-dialog-decline').modal('show');
+clearEditorContent();
+
+$('#priest-select').val('');
+
+$('#schedule_id').val(id);
+
+
+}
+
 function deleteSched(scheduleId) {
     if (confirm('Are you sure you want to delete this schedule?')) {
         $.ajax({
@@ -1027,7 +1130,7 @@ $('#save-event-btn').on('click', function() {
     var fromTime = $('#timepicker-mass-from').val();
     var toTime = $('#timepicker-mass-to').val();
 
-    var priestId = $('#priest-select').val();
+    var priestId = $('#modal-create-mass-sched #priest-select').val();
 
     console.log('Oras ng Simula:', fromTime);
     console.log('Oras ng Pagtatapos:', toTime);
@@ -1093,7 +1196,7 @@ $('#save-event-btn').on('click', function() {
                 sched_type: 'mass_sched',
             },
             success: function(response) {
-                alert('Schedule was updated successfully!');
+                alert('Schedule was created successfully!');
                 // Optionally, you can close the modal or reset the form here
                 $('#datepicker').val('');
                 $('#timepicker-mass-from').val('');
@@ -1114,6 +1217,65 @@ $('#save-event-btn').on('click', function() {
     }
 
 
+});
+
+$(document).ready(function() {
+    $("#decline-form").on("submit", function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        let scheduleId = $("#decline-form #schedule_id").val();
+        let priestId = $("#decline-form #priest-select").val();
+        let reason = $("#decline-form #editor-text").val().trim();
+
+        // Clear previous errors
+        $(".error-message").remove();
+
+        // Validation
+        let hasError = false;
+
+        if (!priestId) {
+            $("#decline-form #priest-select").after(
+                '<small class="text-danger error-message">Please select a priest.</small>');
+            hasError = true;
+        }
+        if (!reason) {
+            $("#decline-form #editor-text").after(
+                '<small class="text-danger error-message">Reason is required.</small>');
+            hasError = true;
+        }
+
+        if (hasError) {
+            return; // Stop submission if validation fails
+        }
+
+        $.ajax({
+            url: `/request/${scheduleId}/decline`,
+            method: "POST",
+            data: {
+                priest_id: priestId,
+                reason: reason,
+                _token: $('meta[name="csrf-token"]').attr("content")
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert("Request updated with the referred priest successfully.");
+                    $("#modal-dialog-decline").modal("hide");
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr) {
+                alert("An error occurred while processing the request.");
+            }
+        });
+    });
+
+    // Set Schedule ID when opening modal
+    $("#modal-dialog-decline").on("show.bs.modal", function(e) {
+        let scheduleId = $(e.relatedTarget).data("schedule-id");
+        $("#schedule_id").val(scheduleId);
+    });
 });
 </script>
 @endpush

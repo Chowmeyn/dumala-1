@@ -375,7 +375,7 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(response) {
-                alert('Announcement archived sucessfully!');
+                alert('Announcement archived successfully!');
                 location.href = "{{ route('anouncements') }}";
             },
             error: function(xhr) {
