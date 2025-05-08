@@ -57,6 +57,47 @@
                         </div>
                     </div>
                 </div>
+                 <!-- Add Purpose Filter -->
+                 <div class="col-md-2 mt-2">
+                    <div class="row mb-3">
+                        <label class="form-label col-form-label col-md-3">Purpose:</label>
+                        <div class="col-md-9">
+                            <select id="get-liturgical" class="form-select" onchange="getLiturgicalId(this)">
+                                <option value="all"> All</option>
+                                @foreach(get_all_liturgical() as $liturgical)
+                                <option value=" {{$liturgical->title}}"> {{$liturgical->title}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add Download Excel Button -->
+                <div class="col-md-12 mb-3">
+                    <button id="downloadExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Download Excel
+                    </button>
+                </div>
+                <!-- Add Summary Section -->
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">Summary Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 text-center">
+                                        <h6>Total Services</h6>
+                                        <h3 id="totalServices">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="serviceBreakdown">
+                                <!-- Service breakdown will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row mt-3">
 
@@ -141,6 +182,7 @@ getList($('#get-priest').val(),dt);
 
 function getPriestId(selectElement) {
     const selectedId = selectElement.value; // Get the selected priest's ID
+    $('#get-liturgical').val('all');
     getList(selectedId, $("#default-daterange input").val());
     // You can do whatever you need with the ID here, like making an API call
 }
@@ -148,24 +190,9 @@ function getPriestId(selectElement) {
 
 function handleDateChange(inputElement) {
     const selectedRange = inputElement.value;
+    $('#get-liturgical').val('all');
     getList($('#get-priest').val(), selectedRange);
     console.log("Selected Date Range:", selectedRange);
-
-}
-
-
-// Clear the CKEditor content
-function clearEditorContent() {
-    if (window.editor) {
-        window.editor.setData(''); // Clears the editor content
-    }
-}
-
-// Populate the CKEditor with data for editing
-function populateEditorWithData(data) {
-    if (window.editor) {
-        window.editor.setData(data); // Sets the content to the editor
-    }
 }
 
 function getList(search = '', date_range = '', page = 1) {
@@ -178,6 +205,147 @@ function getList(search = '', date_range = '', page = 1) {
             search: search,
             date_range: date_range,
             page: page
+        },
+        success: function(response) {
+            const {
+                data,
+                total,
+                current_page,
+                per_page
+            } = response;
+            
+            updateSummaryStats(data, total);
+
+            const tbody = $('table.table tbody');
+            tbody.empty();
+
+            if (data.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="4" class="text-center">No data available.</td>
+                    </tr>
+                `);
+                return;
+            }
+
+            // Populate table rows
+            data.forEach((item, index) => {
+                const rowId = `detailsRow${index + 1}`;
+                tbody.append(`
+                    <!-- Main Row -->
+                    <tr data-bs-toggle="collapse" data-bs-target="#${rowId}" aria-expanded="false" aria-controls="${rowId}">
+                        <td>
+                            <img src="${item.profile_image}" class="rounded h-50px my-n1 mx-n1" alt="User" />
+                        </td>
+                        <td style="padding-top: 20px;">${item.created_by_name}</td>
+                        <td style="padding-top: 20px;">${item.purpose}</td>
+                        <td style="padding-top: 20px;">${item.date}</td>
+                        
+                    </tr>
+                    <!-- Collapsible Content -->
+                    <tr id="${rowId}" class="collapse fade">
+                        <td colspan="4">
+                            <div class="p-1 bg-light">
+                                <div class="d-flex p-1">
+                                    <div class="flex-1">
+                                        <table class="table mb-2" style="border: none !important;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="border: none !important;"><strong>Requested Priest:</strong></td>
+                                                    <td style="border: none !important;">${item.assign_to_name || 'N/A'}</td>
+                                                    <td style="border: none !important;"><strong>Time:</strong></td>
+                                                    <td style="border: none !important;">${item.time_from} - ${item.time_to}</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td style="border: none !important;"><strong>Venue:</strong></td>
+                                                    <td style="border: none !important;">${item.venue || 'N/A'}</td>
+                                                    <td style="border: none !important;"><strong>Status:</strong></td>
+                                                    <td style="border: none !important;">${item.status === 1 
+                                                            ? '<span class="badge bg-yellow text-black">Pending</span>' 
+                                                            : item.status === 2 
+                                                                ? '<span class="badge bg-primary">Accepted</span>' 
+                                                                : item.status === 3 
+                                                                    ? '<span class="badge bg-danger">Declined</span>' 
+                                                                    : item.status === 4 
+                                                                        ? '<span class="badge bg-info text-black">Complete</span>' 
+                                                                        : item.status === 5 
+                                                                            ? '<span class="badge bg-secondary">Archived</span>' 
+                                                                            : '<span class="badge bg-success">Accepted by priest</span>' }</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td style="border: none !important;"><strong>Address:</strong></td>
+                                                    <td style="border: none !important;">${item.address || 'N/A'}</td>
+                                                    
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            // Update pagination
+            updatePagination(total, current_page, per_page);
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+            const tbody = $('table.table tbody');
+            tbody.empty();
+            tbody.append(`
+                <tr>
+                    <td colspan="4" class="text-center">An error occurred while fetching data.</td>
+                </tr>
+            `);
+        }
+    });
+}
+
+function updatePagination(total, currentPage, perPage) {
+    const pagination = $('.pagination');
+    const totalPages = Math.ceil(total / perPage);
+
+    pagination.empty();
+    if (totalPages === 0) return;
+
+    pagination.append(`
+        <div class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage - 1})">«</a>
+        </div>
+    `);
+
+    for (let i = 1; i <= totalPages; i++) {
+        pagination.append(`
+            <div class="page-item ${currentPage === i ? 'active' : ''}">
+                <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${i})">${i}</a>
+            </div>
+        `);
+    }
+
+    pagination.append(`
+        <div class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage + 1})">»</a>
+        </div>
+    `);
+}
+
+function getLiturgicalList(search = '', year='', page = 1) {
+    currentPage = page; // Update current page
+    $.ajax({
+        url: '/list-request-liturgical',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            search: search === 'all' ? '' : search,
+            year: year,
+            page: page,
+            priest_id: $('#get-priest').val() // Add the priest ID to maintain selection
         },
         success: function(response) {
             const {
@@ -270,103 +438,100 @@ function getList(search = '', date_range = '', page = 1) {
             tbody.empty();
             tbody.append(`
                 <tr>
-                    <td colspan="4" class="text-center">An error occurred while fetching data.</td>
+                    <td colspan="3" class="text-center">An error occurred while fetching data.</td>
                 </tr>
             `);
         }
     });
 }
 
-
-
-
-function onclickDecline(id) {
-
-    $('#modal-dialog-decline').modal('show');
-    clearEditorContent();
-
-    $('#priest-select').val('');
-
-
+// Also update the getLiturgicalId function to pass both values
+function getLiturgicalId(selectElement) {
+    const selectedLiturgical = selectElement.value;
+    const selectedPriest = $('#get-priest').val();
+    const selectedYear = $('#yearSelect').val();
+    if (selectedLiturgical === 'all') {
+        // If 'all' is selected, use the regular getList function
+        getList(selectedPriest, selectedYear, 1);
+    } else {
+        // Otherwise use the liturgical-specific list
+        getLiturgicalList(selectedLiturgical, selectedYear, 1);
+    }
 }
 
-function onclickAssignToPriest(id) {
+// Add this new function for Excel download
+$('#downloadExcel').click(function() {
+    const selectedPriest = $('#get-priest').val();
+    const selectedYear = $('#yearSelect').val();
+    
+    // Create a temporary form to submit the download request
+    const form = document.createElement('form');
+    form.method = 'POST'; // Change from GET to POST
+    form.action = '/download-priest-report-excel';
+    
+    // Add priest ID parameter
+    const priestInput = document.createElement('input');
+    priestInput.type = 'hidden';
+    priestInput.name = 'priest_id';
+    priestInput.value = selectedPriest;
+    form.appendChild(priestInput);
+    
+    // Add year parameter
+    const yearInput = document.createElement('input');
+    yearInput.type = 'hidden';
+    yearInput.name = 'year';
+    yearInput.value = selectedYear;
+    form.appendChild(yearInput);
+    
+    // Add CSRF token
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = '_token';
+    tokenInput.value = '{{ csrf_token() }}';
+    form.appendChild(tokenInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+});
 
-    $('#modal-dialog-assign-to-priest').modal('show');
-    $('.assign_post').attr('data-id', id);
-
-
-}
-
-function onclickAssignPost(id) {
-    console.log(id);
-
-
-    $.ajax({
-        url: `/assign_priest`,
-        method: 'POST',
-        dataType: 'json',
-        data: {
-            user_id: id,
-            sched_id: $('.assign_post').attr('data-id')
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-
-            if (response.status == 1) {
-                $('#modal-dialog-assign-to-priest').modal('hide');
-                message({
-                    title: 'Success!',
-                    message: response.message,
-                    icon: 'success'
-                });
-                getList();
-            } else {
-                message({
-                    title: 'Error!',
-                    message: response.message,
-                    icon: 'error'
-                });
-            }
-
-        },
-        error: function(xhr, status, error) {
-            console.error('Error updating user:', error);
+function updateSummaryStats(data, total) {
+    // Calculate service type statistics
+    const serviceStats = {};
+    
+    data.forEach(item => {
+        if (!serviceStats[item.purpose]) {
+            serviceStats[item.purpose] = {
+                total: 0,
+                completed: 0
+            };
+        }
+        serviceStats[item.purpose].total++;
+        if (item.status === 4) {
+            serviceStats[item.purpose].completed++;
         }
     });
 
+    // Update total services
+    $('#totalServices').text(total);
+    
+    // Update service breakdown
+    const breakdownContainer = $('#serviceBreakdown');
+    breakdownContainer.empty();
 
-}
-
-
-function updatePagination(total, currentPage, perPage) {
-    const pagination = $('.pagination');
-    const totalPages = Math.ceil(total / perPage);
-
-    pagination.empty();
-    if (totalPages === 0) return;
-
-    pagination.append(`
-        <div class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage - 1})">«</a>
-        </div>
-    `);
-
-    for (let i = 1; i <= totalPages; i++) {
-        pagination.append(`
-            <div class="page-item ${currentPage === i ? 'active' : ''}">
-                <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${i})">${i}</a>
+    Object.entries(serviceStats).forEach(([service, stats]) => {
+        breakdownContainer.append(`
+            <div class="col-md-3 mb-3">
+                <div class="border rounded p-3 text-center">
+                    <h6>${service}</h6>
+                    <div class="mt-2">
+                        <h4>${stats.completed}</h4>
+                        <small class="text-muted">Completed Services</small>
+                    </div>
+                </div>
             </div>
         `);
-    }
-
-    pagination.append(`
-        <div class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage + 1})">»</a>
-        </div>
-    `);
+    });
 }
 </script>
 @endpush

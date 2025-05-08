@@ -398,6 +398,7 @@ class ScheduleController extends Controller
 
         $user = User::find($request->input('assign_to'));
         $user_name_f = $user ? (($user->prefix ? $user->prefix . '.' : '') . ' ' . $user->firstname . ' ' . $user->lastname) : 'N/A';
+        $user_role = $user ? $user->role : 'N/A';
 
         $validated['date'] = $date_now;
         $validated['time_from'] = $time_from_24;
@@ -408,7 +409,11 @@ class ScheduleController extends Controller
         $validated['assign_to'] = $request->input('assign_to');
         $validated['assign_by'] = Auth::user()->id;
         if ($validated['assign_by'] == $validated['assign_to']) {
-            $validated['status'] = '6'; // Set status to 6
+            if ($user_role == 'parish_priest') {
+                $validated['status'] = '2'; // Set status to 3
+            } else {
+                $validated['status'] = '6'; // Set status to 6
+            }
         } else {
             $validated['status'] = '1'; // Default status
         }

@@ -30,8 +30,8 @@
             <div class="row">
                 <div class="col-md-2">
                     <select id="get-priest" class="form-select" onchange="getPriestId(this)">
-                        @foreach(get_all_liturgical() as $priest)
-                        <option value=" {{$priest->title}}"> {{$priest->title}}</option>
+                        @foreach(get_all_liturgical() as $liturgical)
+                        <option value=" {{$liturgical->title}}"> {{$liturgical->title}}</option>
                         @endforeach
 
 
@@ -252,70 +252,6 @@ function getList(search = '', year='', page = 1) {
         }
     });
 }
-
-
-
-
-function onclickDecline(id) {
-
-    $('#modal-dialog-decline').modal('show');
-    clearEditorContent();
-
-    $('#priest-select').val('');
-
-
-}
-
-function onclickAssignToPriest(id) {
-
-    $('#modal-dialog-assign-to-priest').modal('show');
-    $('.assign_post').attr('data-id',id);
-    
-
-}
-
-function onclickAssignPost(id) {
-    console.log(id);
-    
-
-    $.ajax({
-        url: `/assign_priest`,
-        method: 'POST',
-        dataType: 'json',
-        data: {
-            user_id: id,
-            sched_id:  $('.assign_post').attr('data-id')
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-
-            if (response.status == 1) {
-                $('#modal-dialog-assign-to-priest').modal('hide');
-                message({
-                    title: 'Success!',
-                    message: response.message,
-                    icon: 'success'
-                });
-                getList();
-            }else{
-                message({
-                    title: 'Error!',
-                    message: response.message,
-                    icon: 'error'
-                });
-            }
-
-        },
-        error: function(xhr, status, error) {
-            console.error('Error updating user:', error);
-        }
-    });
-    
-
-}
-
 
 function updatePagination(total, currentPage, perPage) {
     const pagination = $('.pagination');

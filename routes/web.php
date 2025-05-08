@@ -114,8 +114,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/liturgicals/{liturgical}/edit', [App\Http\Controllers\LiturgicalController::class, 'edit'])->name('liturgicals.edit');
 
     Route::get('/liturgical/create', [App\Http\Controllers\LiturgicalController::class, 'create'])->name('liturgicals.create');
-
-
+    Route::post('/download-priest-report-excel', [App\Http\Controllers\DownloadExcelController::class, 'downloadPriestReport'])->name('download.priest.report');
 });
 
 Route::post('/user/register', [UserController::class, 'registerAccount'])->name('user.reister');

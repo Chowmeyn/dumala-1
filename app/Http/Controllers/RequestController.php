@@ -104,10 +104,11 @@ class RequestController extends Controller
         $year = $request->input('year');
         $month = $request->input('month');
         $date_range = $request->input('date_range');
+        $priest_id = $request->input('priest_id');
         $perPage = 10; // Items per page
         $time_from_24 = date('H:i:s', strtotime($request->input('time_from')));
         $time_to_24 = date('H:i:s', strtotime($request->input('time_to')));
-    
+
         $query = DB::table('schedule_events_view_v2')
         ->leftJoin('declined_requests', 'schedule_events_view_v2.schedule_id', '=', 'declined_requests.schedule_id')
         ->select(
@@ -117,6 +118,10 @@ class RequestController extends Controller
             'declined_requests.created_at as declined_at'
         );
     
+        if ($priest_id) {
+            $query->where('schedule_events_view_v2.assign_to', $priest_id);
+        }
+        
         $id_ = Auth::user()->id;
     
         if (!in_array(Auth::user()->role, ['admin', 'parish_priest', 'secretary'])) {

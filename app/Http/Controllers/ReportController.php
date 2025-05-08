@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Donor;
 use App\Models\Announcement;
 use App\Models\Marriage;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -60,7 +61,10 @@ class ReportController extends Controller
         }
     
         $donorEntries = []; // Array to hold donor entries for announcement content
-    
+
+        $user_role = Auth::user() ? Auth::user()->role : 'N/A';
+        $status = $user_role === 'parish_priest' ? 'is_posted' : 'is_pending';
+
         foreach ($request->donors as $donor) {
             // Create the Donor entry
             Donor::create([
@@ -70,7 +74,7 @@ class ReportController extends Controller
                 'donated_amount' => $donor['donated_amount'],
                 'parent' => $parent,
                 'short' => $short++,
-                'status' => 'is_pending',
+                'status' => $status,
             ]);
     
             // Add to donorEntries for announcement content
@@ -83,7 +87,7 @@ class ReportController extends Controller
             'content' => '<ul>' . implode('', $donorEntries) . '</ul>', // Convert array to unordered list
             'parent' => $parent,
             'announcement_type' => $request->announcement_type,
-            'status' => 'is_pending',
+            'status' => $status,
         ]);
     
         return response()->json(['message' => 'Donors and announcements saved successfully!']);
@@ -113,12 +117,15 @@ class ReportController extends Controller
         // Generate marriage entry content
         $marriageEntries = $this->generateMarriageContent($request);
     
+        $user_role = Auth::user() ? Auth::user()->role : 'N/A';
+        $status = $user_role === 'parish_priest' ? 'is_posted' : 'is_pending';
+
         Announcement::create([
             'title' => $request->marriage_bann,
             'content' => $marriageEntries,
             'parent' => $parent,
             'announcement_type' => $request->announcement_type,
-            'status' => 'is_pending',
+            'status' => $status,
         ]);
     
         return response()->json(['success' => 'Announcement saved successfully!', 'marriage' => $marriage]);
@@ -219,13 +226,16 @@ class ReportController extends Controller
         if ($data) {
             $parent = (int)$data->parent + 1;
         }
+        $user_role = Auth::user() ? Auth::user()->role : 'N/A';
+        $status = $user_role === 'parish_priest' ? 'is_posted' : 'is_pending';
+
         // Create a new announcement
         Announcement::create([
             'title' => $request->title,
             'content' => $request->content,
             'announcement_type' => $request->announcement_type,
             'parent' => $parent,
-            'status' => 'is_pending',
+            'status' => $status,
         ]);
 
         return response()->json(['success' => true]);
