@@ -17,7 +17,9 @@ class RequestController extends Controller
      */
     public function index()
     {
-        return view('pages.requests');
+        // Get declined priest IDs for the view
+        $declinedPriestIds = DeclinedRequest::pluck('referred_priest_id')->unique()->toArray();
+        return view('pages.requests', compact('declinedPriestIds'));
     }
 
     /**
@@ -35,13 +37,9 @@ class RequestController extends Controller
         $time_to_24 = date('H:i:s', strtotime($request->input('time_to')));
     
         $query = DB::table('schedule_events_view_v2')
-        ->leftJoin('declined_requests', 'schedule_events_view_v2.schedule_id', '=', 'declined_requests.schedule_id')
         ->leftJoin('liturgicals', 'schedule_events_view_v2.purpose', '=', 'liturgicals.title') // Join with liturgicals table
         ->select(
             'schedule_events_view_v2.*',
-            'declined_requests.reason as declined_reason',
-            'declined_requests.referred_priest_id as declined_priest_id',
-            'declined_requests.created_at as declined_at',
             'liturgicals.requirements as purpose_requirements' // Fetch requirements from liturgicals table
         )
         ->where('schedule_events_view_v2.status', '!=', 4);
@@ -250,25 +248,56 @@ class RequestController extends Controller
 
     public function declineRequest(Request $request, $id)
     {
-        $schedule = Schedule::find($id);
-        if (!$schedule) {
-            return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+        try {
+            DB::beginTransaction();
+            
+            $schedule = Schedule::find($id);
+            if (!$schedule) {
+                return response()->json(['success' => false, 'message' => 'Request not found.'], 404);
+            }
+    
+            if (!$request->priest_id) {
+                return response()->json(['success' => false, 'message' => 'Please select a priest.'], 400);
+            }
+    
+            if (!$request->reason) {
+                return response()->json(['success' => false, 'message' => 'Please provide a reason.'], 400);
+            }
+        
+            // Get the current authenticated user's ID (the declining priest)
+            $decliningPriestId = Auth::id();
+            
+            // Check if this priest has already declined this request
+            $existingDecline = DeclinedRequest::where('schedule_id', $id)
+                ->where('referred_priest_id', $decliningPriestId)
+                ->first();
+                
+            // Get the new priest's information
+            $newPriest = User::find($request->priest_id);
+            if (!$newPriest) {
+                return response()->json(['success' => false, 'message' => 'Selected priest not found.'], 404);
+            }
+            
+            // Update the schedule with the new referred priest
+            $schedule->assign_to = $request->priest_id;
+            $schedule->assign_to_name = $newPriest->firstname . ' ' . $newPriest->lastname;
+            $schedule->status = 3; // Status for pending referral
+            $schedule->save();
+        
+            // Log the decline with the current user's ID as the declining priest
+            DeclinedRequest::create([
+                'schedule_id' => $id,
+                'referred_priest_id' => $decliningPriestId,
+                'reason' => $request->reason,
+            ]);
+        
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Request declined and referred successfully.']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Decline request error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'An error occurred while processing the request.'], 500);
         }
-
-        // Update the current schedule with the referred priest
-        $schedule->assign_to = $request->priest_id;
-        $schedule->assign_to_name = User::find($request->priest_id)->firstname . ' ' . User::find($request->priest_id)->lastname;
-        $schedule->status = 3; // Assuming 3 means declined
-        $schedule->save();
-
-        // Optionally, log the decline reason in the DeclinedRequest table
-        DeclinedRequest::create([
-            'schedule_id' => $id,
-            'referred_priest_id' => $request->priest_id,
-            'reason' => $request->reason,
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Request updated with the referred priest successfully.']);
     }
 
 

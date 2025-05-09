@@ -20,4 +20,14 @@ class DeclinedRequest extends Model
     {
         return $this->belongsTo(User::class, 'referred_priest_id');
     }
+
+    public function declinedPriests()
+    {
+        return $this->belongsToMany(Priest::class, 'declined_requests');
+    }
+
+    public function declinedRequests()
+    {
+        return $this->belongsToMany(Request::class, 'declined_requests');
+    }
 }

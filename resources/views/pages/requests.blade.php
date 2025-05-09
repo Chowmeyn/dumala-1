@@ -84,30 +84,33 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-hidden="true"></button>
             </div>
             <form id="decline-form">
-                <div class="modal-body">
-                    <input type="hidden" id="schedule_id" name="schedule_id"> <!-- Hidden input for schedule ID -->
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" id="schedule_id" name="schedule_id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Refer Another Priest:</label>
+                            <select class="form-select" id="priest-select" name="priest_id">
+                                <option value="" selected>Choose a priest</option>
+                                @foreach(get_all_priest() as $priest)
+                                    @if(!in_array($priest->id, $declinedPriestIds ?? []) && $priest->id != Auth::id())
+                                        <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Refer Another Priest:</label>
-                        <select class="form-select" id="priest-select" name="priest_id">
-                            <option value="" selected>Choose a priest</option>
-                            @foreach(get_all_priest() as $priest)
-                            <option value="{{ $priest->id }}">{{ $priest->firstname }} {{ $priest->lastname }}</option>
-                            @endforeach
-                        </select>
+                        <div class="mb-3">
+                            <label class="form-label">Add a reason:</label>
+                            <textarea id="editor-text" name="reason" class="form-control"></textarea>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Add a reason:</label>
-                        <textarea id="editor-text" name="reason" class="form-control"></textarea>
+                    <div class="modal-footer">
+                        <a href="javascript:;" class="btn btn-white" data-bs-dismiss="modal">Close</a>
+                        <button type="submit" class="btn btn-danger">Decline</button>
                     </div>
-                </div>
-
-                <div class="modal-footer">
-                    <a href="javascript:;" class="btn btn-white" data-bs-dismiss="modal">Close</a>
-                    <button type="submit" class="btn btn-danger">Decline</button>
-                </div>
-            </form>
+                </form>
         </div>
     </div>
 </div>
@@ -740,7 +743,7 @@ function getActionButtons(item, userRole, userName) {
             <p class="mb-0 d-flex justify-content-end">
             <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+            ${(userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
@@ -756,7 +759,7 @@ function getActionButtons(item, userRole, userName) {
         }
         return `
             <p class="mb-0 d-flex justify-content-end">
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+            ${(userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
@@ -773,7 +776,7 @@ function getActionButtons(item, userRole, userName) {
             <p class="mb-0 d-flex justify-content-end">
             <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+            ${(userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
@@ -789,37 +792,31 @@ function getActionButtons(item, userRole, userName) {
         } else {
             return `
             <p class="mb-0 d-flex justify-content-end">
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
+            ${(userRole === 'admin' || userRole === 'parish_priest') ? `
                 <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
             ` : ''}
         </p>
         `;
         }
     }
-    if (item.created_by === <?= Auth::user()->id ?>){
-            return `
-            <p class="mb-0 d-flex justify-content-end">
-            <a href="javascript:;" class="btn btn-sm btn-primary me-5px" onclick="onclickEdit(${item.schedule_id})">Edit</a>
-            <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDelete(${item.schedule_id})">Cancel</a>
-            ${(userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove(${item.schedule_id},2)">Approve</a>
-            ` : ''}
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
-            ` : ''}
-        </p>
-        `;
-    }
+    // if (item.created_by === <?= Auth::user()->id ?>){
+    //         return `
+    //         <p class="mb-0 d-flex justify-content-end">
+    //         ${(userRole === 'admin' || userRole === 'parish_priest') ? `
+    //             <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove(${item.schedule_id},2)">Approve</a>
+    //         ` : ''}
+    //         ${(userRole === 'admin' || userRole === 'parish_priest') ? `
+    //             <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
+    //         ` : ''}
+    //     </p>
+    //     `;
+    // }
         return `
             <p class="mb-0 d-flex justify-content-end">
             ${(userRole === 'parish_priest') ? `
             <a href="javascript:;" class="btn btn-sm btn-success me-5px" onclick="onclickApprove(${item.schedule_id},2)">Approve</a>
             <a href="javascript:;" class="btn btn-sm btn-danger me-5px btn_decline" onclick="onclickDecline(${item.schedule_id})">Decline</a>
             ` : `` } 
-            
-            ${item.declined_priest_id && (userRole === 'admin' || userRole === 'parish_priest') ? `
-                <a href="javascript:;" class="btn btn-sm btn-warning" onclick="onclickAssignToPriest(${item.schedule_id})">Assign another priest</a>
-            ` : ''}
         </p>
         `;
     
@@ -913,21 +910,16 @@ function onclickDelete(schedId) {
     });
 }
 
-function onclickDecline(id) {
-
-    console.log(id);
-
-
+function onclickDecline(scheduleId) {
+    $('#schedule_id').val(scheduleId);
     $('#modal-dialog-decline').modal('show');
-    clearEditorContent();
-
+    
+    // Reset form fields
     $('#priest-select').val('');
-
-    $('#schedule_id').val(id);
-
-
+    if (window.editor) {
+        window.editor.setData('');
+    }
 }
-
 function onclickAssignToPriest(id) {
 
     $('#modal-dialog-assign-to-priest').modal('show');
@@ -1101,63 +1093,60 @@ $("#timepicker-to").timepicker();
 $("#timepicker-mass-from").timepicker();
 $("#timepicker-mass-to").timepicker();
 
-$(document).ready(function() {
-    $("#decline-form").on("submit", function(e) {
-        e.preventDefault(); // Prevent default form submission
-
-        let scheduleId = $("#schedule_id").val();
-        let priestId = $("#priest-select").val();
-        let reason = $("#editor-text").val().trim();
-
-        // Clear previous errors
-        $(".error-message").remove();
-
-        // Validation
-        let hasError = false;
-
-        if (!priestId) {
-            $("#priest-select").after(
-                '<small class="text-danger error-message">Please select a priest.</small>');
-            hasError = true;
-        }
-        if (!reason) {
-            $("#editor-text").after(
-                '<small class="text-danger error-message">Reason is required.</small>');
-            hasError = true;
-        }
-
-        if (hasError) {
-            return; // Stop submission if validation fails
-        }
-
-        $.ajax({
-            url: `/request/${scheduleId}/decline`,
-            method: "POST",
-            data: {
-                priest_id: priestId,
-                reason: reason,
-                _token: $('meta[name="csrf-token"]').attr("content")
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert("Request updated with the referred priest successfully.");
-                    $("#modal-dialog-decline").modal("hide");
-                    location.reload();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr) {
-                alert("An error occurred while processing the request.");
+$('#decline-form').on('submit', function(e) {
+    e.preventDefault();
+    
+    const scheduleId = $('#schedule_id').val();
+    const priestId = $('#priest-select').val();
+    const reason = window.editor.getData();
+    
+    // Disable submit button to prevent multiple submissions
+    const submitButton = $(this).find('button[type="submit"]');
+    submitButton.prop('disabled', true);
+    
+    $.ajax({
+        url: '/request/' + scheduleId + '/decline',
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            priest_id: priestId,
+            reason: reason,
+            schedule_id: scheduleId
+        },
+        success: function(response) {
+            if (response.success) {
+                // Reset form and editor
+                $('#decline-form')[0].reset();
+                window.editor.setData('');
+                
+                // Hide modal
+                $('#modal-dialog-decline').modal('hide');
+                
+                // Update the list without page reload
+                getList($('#search-input').val(), currentPage);
+                
+                alert(response.message);
+            } else {
+                alert(response.message || 'An error occurred');
             }
-        });
+        },
+        error: function(xhr) {
+            alert(xhr.responseJSON?.message || 'An error occurred');
+        },
+        complete: function() {
+            // Re-enable submit button
+            submitButton.prop('disabled', false);
+        }
     });
+});
 
-    // Set Schedule ID when opening modal
-    $("#modal-dialog-decline").on("show.bs.modal", function(e) {
-        let scheduleId = $(e.relatedTarget).data("schedule-id");
-        $("#schedule_id").val(scheduleId);
-    });
+// Add this to handle modal close
+$('#modal-dialog-decline').on('hidden.bs.modal', function () {
+    // Reset the form
+    $('#decline-form')[0].reset();
+    window.editor.setData('');
+    // Clear any previous priest selection
+    $('#priest-select').val('');
 });
 </script>
 @endpush
