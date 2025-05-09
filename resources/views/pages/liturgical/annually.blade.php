@@ -55,6 +55,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-12 mb-3">
+                    <button id="downloadExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Download Excel
+                    </button>
+                </div>
+                <!-- Add Summary Section -->
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">Summary Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 text-center">
+                                        <h6>Total Completed</h6>
+                                        <h3 id="totalServices">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="serviceBreakdown">
+                                <!-- Service breakdown will be populated dynamically -->
+                            </div>
+                        </div>
             </div>
             <div class="row mt-3">
 
@@ -130,20 +154,6 @@ function getYear(selectElement) {
     // You can do whatever you need with the ID here, like making an API call
 }
 
-// Clear the CKEditor content
-function clearEditorContent() {
-    if (window.editor) {
-        window.editor.setData(''); // Clears the editor content
-    }
-}
-
-// Populate the CKEditor with data for editing
-function populateEditorWithData(data) {
-    if (window.editor) {
-        window.editor.setData(data); // Sets the content to the editor
-    }
-}
-
 function getList(search = '', year='', page = 1) {
     currentPage = page; // Update current page
     $.ajax({
@@ -162,6 +172,9 @@ function getList(search = '', year='', page = 1) {
                 current_page,
                 per_page
             } = response;
+            
+            updateSummaryStats(data, total);
+
             const tbody = $('table.table tbody');
             tbody.empty();
 
@@ -279,6 +292,27 @@ function updatePagination(total, currentPage, perPage) {
             <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage + 1})">»</a>
         </div>
     `);
+}
+
+function updateSummaryStats(data, total) {
+    // Calculate service type statistics
+    const serviceStats = {};
+    
+    data.forEach(item => {
+        if (!serviceStats[item.purpose]) {
+            serviceStats[item.purpose] = {
+                total: 0,
+                completed: 0
+            };
+        }
+        serviceStats[item.purpose].total++;
+        if (item.status === 4) {
+            serviceStats[item.purpose].completed++;
+        }
+    });
+
+    // Update total services
+    $('#totalServices').text(total);
 }
 </script>
 @endpush

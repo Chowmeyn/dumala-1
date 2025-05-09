@@ -84,7 +84,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <div class="border rounded p-3 text-center">
-                                        <h6>Total Services</h6>
+                                        <h6>Total Completed Services</h6>
                                         <h3 id="totalServices">0</h3>
                                     </div>
                                 </div>
@@ -197,7 +197,7 @@ function getList(search = '', year='', page = 1) {
                 current_page,
                 per_page
             } = response;
-            
+
             updateSummaryStats(data, total);
 
             const tbody = $('table.table tbody');

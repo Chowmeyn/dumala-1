@@ -69,9 +69,32 @@
                             </select>
                         </div>
                     </div>
-
                 </div>
-            </div>
+                <div class="col-md-12 mb-3">
+                    <button id="downloadExcel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Download Excel
+                    </button>
+                </div>
+                <!-- Add Summary Section -->
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">Summary Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 text-center">
+                                        <h6>Total Completed</h6>
+                                        <h3 id="totalServices">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="serviceBreakdown">
+                                <!-- Service breakdown will be populated dynamically -->
+                            </div>
+                        </div>
+                </div>
             <div class="row mt-3">
 
 
@@ -211,6 +234,9 @@ function getList(search = '', year = '', month = '', page = 1) {
                 current_page,
                 per_page
             } = response;
+            
+            updateSummaryStats(data, total);
+
             const tbody = $('table.table tbody');
             tbody.empty();
 
@@ -303,69 +329,6 @@ function getList(search = '', year = '', month = '', page = 1) {
 }
 
 
-
-
-function onclickDecline(id) {
-
-    $('#modal-dialog-decline').modal('show');
-    clearEditorContent();
-
-    $('#priest-select').val('');
-
-
-}
-
-function onclickAssignToPriest(id) {
-
-    $('#modal-dialog-assign-to-priest').modal('show');
-    $('.assign_post').attr('data-id', id);
-
-
-}
-
-function onclickAssignPost(id) {
-    console.log(id);
-
-
-    $.ajax({
-        url: `/assign_priest`,
-        method: 'POST',
-        dataType: 'json',
-        data: {
-            user_id: id,
-            sched_id: $('.assign_post').attr('data-id')
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-
-            if (response.status == 1) {
-                $('#modal-dialog-assign-to-priest').modal('hide');
-                message({
-                    title: 'Success!',
-                    message: response.message,
-                    icon: 'success'
-                });
-                getList();
-            } else {
-                message({
-                    title: 'Error!',
-                    message: response.message,
-                    icon: 'error'
-                });
-            }
-
-        },
-        error: function(xhr, status, error) {
-            console.error('Error updating user:', error);
-        }
-    });
-
-
-}
-
-
 function updatePagination(total, currentPage, perPage) {
     const pagination = $('.pagination');
     const totalPages = Math.ceil(total / perPage);
@@ -392,6 +355,27 @@ function updatePagination(total, currentPage, perPage) {
 <a href="javascript:;" class="page-link" onclick="getList($('#search-input').val(), ${currentPage + 1})">»</a>
 </div>
 `);
+}
+
+function updateSummaryStats(data, total) {
+    // Calculate service type statistics
+    const serviceStats = {};
+    
+    data.forEach(item => {
+        if (!serviceStats[item.purpose]) {
+            serviceStats[item.purpose] = {
+                total: 0,
+                completed: 0
+            };
+        }
+        serviceStats[item.purpose].total++;
+        if (item.status === 4) {
+            serviceStats[item.purpose].completed++;
+        }
+    });
+
+    // Update total services
+    $('#totalServices').text(total);
 }
 </script>
 @endpush
