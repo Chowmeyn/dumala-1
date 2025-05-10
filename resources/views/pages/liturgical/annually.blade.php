@@ -294,6 +294,37 @@ function updatePagination(total, currentPage, perPage) {
     `);
 }
 
+$('#downloadExcel').on('click', function() {
+    const selectedYear = $('#yearSelect').val();
+    const selectedPurpose = $('#get-priest').val();
+    
+    $.ajax({
+        url: '/generate-priest-report',
+        method: 'POST',
+        data: {
+            year: selectedYear,
+            purpose: selectedPurpose,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            // Create a temporary link and click it to download the file
+            const link = document.createElement('a');
+            link.href = response.file;
+            // Extract the filename from the full URL
+            const fullPath = response.file;
+            const fileName = fullPath.split('/').pop();
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error generating report:', error);
+            alert('Error generating report. Please try again.');
+        }
+    });
+});
+
 function updateSummaryStats(data, total) {
     // Calculate service type statistics
     const serviceStats = {};

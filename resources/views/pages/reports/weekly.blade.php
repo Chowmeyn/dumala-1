@@ -462,37 +462,35 @@ function getLiturgicalId(selectElement) {
 // Add this new function for Excel download
 $('#downloadExcel').click(function() {
     const selectedPriest = $('#get-priest').val();
-    const selectedYear = $('#yearSelect').val();
+    const selectedDateRange = $('#default-daterange input').val();
+    const selectedPurpose = $('#get-liturgical').val();
     
-    // Create a temporary form to submit the download request
-    const form = document.createElement('form');
-    form.method = 'POST'; // Change from GET to POST
-    form.action = '/download-priest-report-excel';
-    
-    // Add priest ID parameter
-    const priestInput = document.createElement('input');
-    priestInput.type = 'hidden';
-    priestInput.name = 'priest_id';
-    priestInput.value = selectedPriest;
-    form.appendChild(priestInput);
-    
-    // Add year parameter
-    const yearInput = document.createElement('input');
-    yearInput.type = 'hidden';
-    yearInput.name = 'year';
-    yearInput.value = selectedYear;
-    form.appendChild(yearInput);
-    
-    // Add CSRF token
-    const tokenInput = document.createElement('input');
-    tokenInput.type = 'hidden';
-    tokenInput.name = '_token';
-    tokenInput.value = '{{ csrf_token() }}';
-    form.appendChild(tokenInput);
-    
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    $.ajax({
+        url: '/generate-priest-report',
+        method: 'POST',
+        data: {
+            priest_id: selectedPriest,
+            date_range: selectedDateRange,
+            purpose: selectedPurpose,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            // Create a temporary link and click it to download the file
+            const link = document.createElement('a');
+            link.href = response.file;
+            // Extract the filename from the full URL
+            const fullPath = response.file;
+            const fileName = fullPath.split('/').pop();
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error generating report:', error);
+            alert('Error generating report. Please try again.');
+        }
+    });
 });
 
 function updateSummaryStats(data, total) {

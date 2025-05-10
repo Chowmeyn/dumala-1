@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RequestController;
+use App\Exports\PriestReportExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -114,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/liturgicals/{liturgical}/edit', [App\Http\Controllers\LiturgicalController::class, 'edit'])->name('liturgicals.edit');
 
     Route::get('/liturgical/create', [App\Http\Controllers\LiturgicalController::class, 'create'])->name('liturgicals.create');
-    Route::post('/download-priest-report-excel', [App\Http\Controllers\DownloadExcelController::class, 'downloadPriestReport'])->name('download.priest.report');
+    Route::post('/generate-priest-report', [App\Http\Controllers\DownloadExcelController::class, 'generatePriestReport'])->name('generate.priest.report');
     Route::post('/request/{id}/decline', [RequestController::class, 'declineRequest'])->name('request.decline');
 });
 
